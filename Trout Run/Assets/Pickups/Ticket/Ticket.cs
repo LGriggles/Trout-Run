@@ -10,6 +10,7 @@ public class Ticket : Pickup {
 	void Start () {
 	}
 
+
 	void OnEnable () {
         _myAnimator = GetComponent<Animator>();
         _myRenderer = GetComponent<SpriteRenderer>();
