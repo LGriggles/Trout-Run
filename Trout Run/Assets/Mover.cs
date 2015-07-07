@@ -127,7 +127,8 @@ public class Mover : MonoBehaviour
 	}
 
 	// MOVEMENT FUNCTIONS
-	public void Move(Vector2 force) { _standardMovement = force; } // Move character
+	public void Move(Vector2 force) { _standardMovement = force; } // Move character]
+    public void MoveInstant(Vector2 velocity) { _relativeVelocity = velocity; } // Move character
     public void Jump(float jumpForce) {	_jump = jumpForce; } // Jump
 	public void endExtendedJump() { _continueJump = false; }
 	public void DropThroughPlatform()
