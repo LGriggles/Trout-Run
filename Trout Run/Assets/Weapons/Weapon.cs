@@ -96,9 +96,9 @@ public abstract class Weapon : MonoBehaviour
 	public virtual void ApplyKnockback(Mover mover, Vector2 impactDirection) {} // called when bullets hit, melee weapons make contact etc
 
 
-	public void Pickup(Enemy enemy){Pickup(enemy, Vector2.zero);}
+	public void Pickup(EnemyOld enemy){Pickup(enemy, Vector2.zero);}
 	public void Pickup(PlayerController player){Pickup(player, Vector2.zero);}
-	public void Pickup(Enemy enemy, Vector2 offset)
+	public void Pickup(EnemyOld enemy, Vector2 offset)
 	{
 		// Set Enemy
 		enemy.weapon = this;
@@ -202,12 +202,14 @@ public abstract class Weapon : MonoBehaviour
             // Probably want to add "collide with platforms only if going down" here as well
 			if(gameObject.layer == _layIgnorePlayer) // being thrown
 			{
+                /*
                 // Don't hit plats when going up
                 if(_collideWithPlatforms && _rigid.velocity.y > 0)
                 {
-                    LevelController.CollideWithPlatforms(_collider, false);
+                    //LevelController.CollideWithPlatforms(_collider, false);
                     _collideWithPlatforms = false;
                 }
+                 * */
 
 				// If not moving switch to non-collidable layer
 				if(Mathf.Abs (_rigid.velocity.x) < 0.1f && Mathf.Abs (_rigid.velocity.y)< 0.1f)
@@ -221,12 +223,14 @@ public abstract class Weapon : MonoBehaviour
 			}
 			else gameObject.layer = _layIgnorePlayer; // default layer
 
+            /*
             // Hit plats if going down or dormant
             if(!_collideWithPlatforms && _rigid.velocity.y <= 0)
             {
-                LevelController.CollideWithPlatforms(_collider, true);
+                //LevelController.CollideWithPlatforms(_collider, true);
                 _collideWithPlatforms = true;
             }
+             * */
 		}
 	}
 

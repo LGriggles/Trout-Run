@@ -51,11 +51,19 @@
      <Compile Include="Assets\DemoPlayer2D.cs" />
      <Compile Include="Assets\Door.cs" />
      <Compile Include="Assets\DoorManager.cs" />
-     <Compile Include="Assets\Enemy\Enemy.cs" />
      <Compile Include="Assets\Enemy\EnemyBullets.cs" />
      <Compile Include="Assets\Enemy\EnemyGrunt.cs" />
      <Compile Include="Assets\Enemy\EnemyLeeFlyer.cs" />
+     <Compile Include="Assets\Enemy\EnemyOld.cs" />
      <Compile Include="Assets\Enemy\EnemySpawner.cs" />
+     <Compile Include="Assets\Enemy\NewScripts\Drone.cs" />
+     <Compile Include="Assets\Enemy\NewScripts\Enemy.cs" />
+     <Compile Include="Assets\Enemy\NewScripts\EnemyBehaviour.cs" />
+     <Compile Include="Assets\Enemy\NewScripts\EnemyManager.cs" />
+     <Compile Include="Assets\Enemy\NewScripts\EnemyPathfinder.cs" />
+     <Compile Include="Assets\Enemy\NewScripts\EnemyTask.cs" />
+     <Compile Include="Assets\Enemy\NewScripts\Flyer.cs" />
+     <Compile Include="Assets\Enemy\NewScripts\LevelNode.cs" />
      <Compile Include="Assets\Fade.cs" />
      <Compile Include="Assets\GUI and HUD\HUD.cs" />
      <Compile Include="Assets\GUIManager.cs" />
@@ -99,7 +107,7 @@
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
      <None Include="Assets\Level Editor\RetroDiffuseTileable.shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
- <HintPath>C:/Users/MetaMan/Documents/GitHub/Trout-Run/Trout Run/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
+ <HintPath>C:/Users/Moley/Documents/Moley's Docs/Unity/TroutGit/Trout-Run/Trout Run/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

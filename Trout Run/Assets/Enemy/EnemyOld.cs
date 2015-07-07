@@ -8,7 +8,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class Enemy : WeaponHolder
+public class EnemyOld : WeaponHolder
 {
     protected WeaponManager _weaponManager;
     protected TicketManager _ticketManager;

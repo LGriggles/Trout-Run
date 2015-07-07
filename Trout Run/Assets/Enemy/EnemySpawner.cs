@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 [System.Serializable]public class EnemySetup
 {
-	public Enemy enemyPrefab;
+	public EnemyOld enemyPrefab;
 	public WeaponName startingWeapon = WeaponName.NONE;
 	public int quantity = 1;
 }
@@ -18,7 +18,7 @@ public class EnemySpawner : MonoBehaviour
 
 	private bool _spawnEnemies = false;
 
-	private List<Enemy> _enemies;
+	private List<EnemyOld> _enemies;
 
 	private Transform _mainCamera; // needed to work out centre of screen
 	private int _enemyCount = 0; // how many enemies currently alive?
@@ -39,7 +39,7 @@ public class EnemySpawner : MonoBehaviour
 	void Start () 
 	{
 		// Set up enemies
-		_enemies = new List<Enemy>();
+		_enemies = new List<EnemyOld>();
 
 		// Set up each enemy based on grunt settings
 		for(int i = 0; i < enemySetups.Length; i++) // for each different setup
@@ -51,7 +51,7 @@ public class EnemySpawner : MonoBehaviour
 				instPos += new Vector3(q, -i, -5); // instantiate in nice orderly queue!
 
 				GameObject enemy = (GameObject)Instantiate(enemySetups[i].enemyPrefab.gameObject, instPos, Quaternion.Euler(0, 0, 0));
-				Enemy enemyScript = enemy.GetComponent<Enemy>();
+				EnemyOld enemyScript = enemy.GetComponent<EnemyOld>();
 
 				//if(enemySetups[i].weaponPrefab != null) enemyScript.AddWeapon(enemySetups[i].weaponPrefab);
 				if((int)(enemySetups[i].startingWeapon) < (int)WeaponName.NUMBER_OF_WEAPONS) enemyScript.startingWeapon = enemySetups[i].startingWeapon;

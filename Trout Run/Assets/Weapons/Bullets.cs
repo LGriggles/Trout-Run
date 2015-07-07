@@ -67,7 +67,7 @@ public class Bullets : MonoBehaviour
 				switch(owner.myTeam)
 				{
 				case WeaponHolder.Team.PLAYER:
-					Enemy enemy = _collisions[j].gameObject.GetComponentInParent<Enemy>();
+					EnemyOld enemy = _collisions[j].gameObject.GetComponentInParent<EnemyOld>();
 					enemy.LoseHealth(_myWeapon.strength);
 					_myWeapon.ApplyKnockback(enemy.GetComponent<Mover>(), velocity);
 					
@@ -112,7 +112,7 @@ public class Bullets : MonoBehaviour
 					switch(_owner.myTeam)
 					{
 					case WeaponHolder.Team.PLAYER:
-						Enemy enemy = _collisions[j].gameObject.GetComponentInParent<Enemy>();
+						EnemyOld enemy = _collisions[j].gameObject.GetComponentInParent<EnemyOld>();
 						enemy.LoseHealth(_myWeapon.strength);
 						_myWeapon.ApplyKnockback(enemy.GetComponent<Mover>(), _particles[i].velocity);
 

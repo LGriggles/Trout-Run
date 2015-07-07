@@ -66,7 +66,7 @@ public class MeleeWeapon : Weapon
             Collider2D colliderIter = collisionResults[i];
             Mover mover = colliderIter.GetComponentInParent<Mover>();
             WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
-            Enemy enemy = colliderIter.GetComponentInParent<Enemy>();
+            EnemyOld enemy = colliderIter.GetComponentInParent<EnemyOld>();
             if(mover != null)
             {
                 if(holder.myTeam != _owner.myTeam)
@@ -101,7 +101,7 @@ public class MeleeWeapon : Weapon
             Collider2D colliderIter = collisionResults[i];
             Mover mover = colliderIter.GetComponentInParent<Mover>();
             WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
-            Enemy enemy = colliderIter.GetComponentInParent<Enemy>();
+            EnemyOld enemy = colliderIter.GetComponentInParent<EnemyOld>();
             if(mover != null)
             {
                 if(holder.myTeam != _owner.myTeam)
@@ -136,7 +136,7 @@ public class MeleeWeapon : Weapon
             Collider2D colliderIter = collisionResults[i];
             Mover mover = colliderIter.GetComponentInParent<Mover>();
             WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
-            Enemy enemy = colliderIter.GetComponentInParent<Enemy>();
+            EnemyOld enemy = colliderIter.GetComponentInParent<EnemyOld>();
             if(mover != null)
             {
                 if(holder.myTeam != _owner.myTeam)
@@ -161,7 +161,7 @@ public class MeleeWeapon : Weapon
             Collider2D colliderIter = collisionResults[i];
             Mover mover = colliderIter.GetComponentInParent<Mover>();
             WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
-            Enemy enemy = colliderIter.GetComponentInParent<Enemy>();
+            EnemyOld enemy = colliderIter.GetComponentInParent<EnemyOld>();
             if(mover != null)
             {
                 if(holder.myTeam != _owner.myTeam)

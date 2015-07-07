@@ -57,7 +57,7 @@
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />
      <None Include="Assets\Level Editor\RetroDiffuseTileable.shader" />
  <Reference Include="Assembly-UnityScript-firstpass">
- <HintPath>C:/Users/MetaMan/Documents/GitHub/Trout-Run/Trout Run/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
+ <HintPath>C:/Users/Moley/Documents/Moley's Docs/Unity/TroutGit/Trout-Run/Trout Run/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

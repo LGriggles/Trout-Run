@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyLeeFlyer : Enemy
+public class EnemyLeeFlyer : EnemyOld
 {
     // State
     public enum State { IDLE = 0, RUN = 1, SHOOT = 2, HIT = 3, DEAD = 4 }; // critical these match animator component, hence exposed values

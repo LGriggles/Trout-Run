@@ -50,6 +50,9 @@ public sealed class LevelController
         }
     }
 
+
+
+    /*
     // Marvelish, now some functions for altering collisions
     static public void CollideWithPlayers(Collider2D other, bool collide)
     {
@@ -66,12 +69,15 @@ public sealed class LevelController
             Physics2D.IgnoreCollision(other, col, !collide);
         }
     }
+     * */
 
+    /*
     static public void Reset()
     {
         _instance = null;
         _instance = new LevelController();
     }
+     * */
 
 
 

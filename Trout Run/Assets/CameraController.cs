@@ -11,6 +11,8 @@ public class CameraController : MonoBehaviour
 	public float damping = 0.8f;
 	private bool _dampingOn = false;
 
+    public Rect constraints;
+
 	void Awake()
 	{
         if (player == null) {
@@ -42,6 +44,11 @@ public class CameraController : MonoBehaviour
 			newPos.y = Mathf.Lerp(transform.position.y, newPos.y, damping * Time.deltaTime);
 
 		}
+
+
+
+        newPos.x = Mathf.Clamp(newPos.x, constraints.xMin, constraints.xMax);
+        newPos.y = Mathf.Clamp(newPos.y, constraints.yMin, constraints.yMax);
 		transform.position = newPos;
 	}
 }

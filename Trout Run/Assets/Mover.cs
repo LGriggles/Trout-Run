@@ -47,8 +47,8 @@ public class Mover : MonoBehaviour
 
 	// THESE VARS ARE THE MOVER'S USE ONLY, NOT FOR TINKERING!
 	Rigidbody2D _rigid; // dependancy...
-	Collider2D _feetCollider;
-    Collider2D _bodyCollider;
+	//Collider2D _feetCollider;
+    //Collider2D _bodyCollider;
 
 	// For moving / setting flags for FixedUpdate
 	Vector2 _standardMovement; // For walking left right and shit
@@ -80,9 +80,17 @@ public class Mover : MonoBehaviour
 	private bool _grounded = false; 
 	public bool onPlatform { get { return _onPlatform; } } // is he on a platform?
 	bool _onPlatform = false; 
-	bool _collideWithPlatforms = true; // should we collide with platforms or not?
+	//bool _collideWithPlatforms = true; // should we collide with platforms or not?
     bool _fallingThroughPlatform = false; // are we currently falling through a platform due to pressing down and jump?
 	bool _continueJump = false;
+
+
+    public bool IsIgnoringPlatforms()
+    {
+        return _fallingThroughPlatform;
+    }
+
+
 
 	// Stuff for knockbacks
 	List<KnockBack> _knockBacks = new List<KnockBack> ();
@@ -124,15 +132,17 @@ public class Mover : MonoBehaviour
 	public void endExtendedJump() { _continueJump = false; }
 	public void DropThroughPlatform()
 	{
-        CollideWithPlatforms(false);
+        //CollideWithPlatforms(false);
         _fallingThroughPlatform = true;
 	}
 
+    /*
     void CollideWithPlatforms(bool collide)
     {
         LevelController.CollideWithPlatforms(_feetCollider, collide);
         _collideWithPlatforms = collide; // set bool to reflect current state
     }
+     * */
 	
 	// Reset
 	public void Reset()
@@ -140,8 +150,8 @@ public class Mover : MonoBehaviour
 		_knockBacks.Clear ();
 		_relativeVelocity = Vector3.zero;
         _layPlatforms = LayerMask.NameToLayer("Platform");
-        LevelController.CollideWithPlatforms(_bodyCollider, false);
-        LevelController.CollideWithPlatforms(_feetCollider, false);
+        //LevelController.CollideWithPlatforms(_bodyCollider, false);
+        //LevelController.CollideWithPlatforms(_feetCollider, false);
 	}
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -154,6 +164,7 @@ public class Mover : MonoBehaviour
 	{
 		_rigid = GetComponent<Rigidbody2D> ();
 
+        /*
         Transform[] children = GetComponentsInChildren<Transform>();
         foreach(Transform child in children)
         {
@@ -162,17 +173,19 @@ public class Mover : MonoBehaviour
         }
         if(_feetCollider == null) Debug.LogError(name + " has no child object called 'FeetCollider' with a collider2D in it, it needs it's feet for platforms!");
         if(_bodyCollider == null) Debug.LogError(name + " has no child object called 'BodyCollider' with a collider2D in it, it needs this for main collisions");
+         * */
 
 
 		// Layers - these need to be different if we're an Enemy or Player :/
 		//_layFeet = LayerMask.NameToLayer("Feet");
-		_layPlatforms = LayerMask.NameToLayer("Platform");
+		//_layPlatforms = LayerMask.NameToLayer("Platform");
 		//_layIgnorePlat = LayerMask.NameToLayer("Ignore Platforms");
 	}
 
     void Start()
     {
-        LevelController.CollideWithPlatforms(_bodyCollider, false);
+        //LevelController.CollideWithPlatforms(_bodyCollider, false);
+        Reset();
     }
 	
 
@@ -183,9 +196,8 @@ public class Mover : MonoBehaviour
 		//MiniProfiler.AddMessage("Top " + _collidedTop + "\nBottom " + _collidedBottom + "\nSides " + _collidedSides);
 		//MiniProfiler.AddMessage("Jumped = " + _jumped);
 		//MiniProfiler.AddMessage("Grounded = " + _grounded);
-		//MiniProfiler.AddMessage("On Platform = " + _onPlatform);
+		MiniProfiler.AddMessage("On Platform = " + _onPlatform);
         //MiniProfiler.AddMessage("Collide Plats " + _collideWithPlatforms + "\nFalling Through " + _fallingThroughPlatform);
-
 	}
 	
 
@@ -215,8 +227,13 @@ public class Mover : MonoBehaviour
 
 
 
+        if (_fallingThroughPlatform && velocity.y <= -6)
+        {
+            _fallingThroughPlatform = false;
+        }
 
 		// Switch layer so we don't collide with platforms when going up
+        /*
         if(velocity.y >= 0 && _collideWithPlatforms) CollideWithPlatforms(false); // if going up turn off collisions with platforms
         else
         {
@@ -230,6 +247,7 @@ public class Mover : MonoBehaviour
                 CollideWithPlatforms(true);
             }
         }
+         * */
 
 
 

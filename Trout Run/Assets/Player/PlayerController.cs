@@ -100,7 +100,7 @@ public class PlayerController : WeaponHolder
         _mover.gravity = _tempGrav;
         _mover.groundAttraction = _tempGrdAtt;
         _mover.minUngroundingSpeed = _tempUngrdSpeed;
-        LevelController.Reset();
+        //LevelController.Reset();
     }
     
     //When this is called the player can shoot
@@ -539,23 +539,24 @@ public class PlayerController : WeaponHolder
 
     private void DisarmEnemy()
     {
-            int size = Physics2D.OverlapCircleNonAlloc(transform.position,3,collisionResults,1 << LayerMask.NameToLayer("Enemy"));
-            for(int i = 0; i < size; i++)
+        int size = Physics2D.OverlapCircleNonAlloc(transform.position,1,collisionResults,1 << LayerMask.NameToLayer("Enemy"));
+        for(int i = 0; i < size; i++)
+        {
+            Collider2D colliderIter = collisionResults[i];
+            Mover mover = colliderIter.GetComponentInParent<Mover>();
+            WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
+            EnemyOld enemy = colliderIter.GetComponentInParent<EnemyOld>();
+            if(mover != null)
             {
-                Collider2D colliderIter = collisionResults[i];
-                Mover mover = colliderIter.GetComponentInParent<Mover>();
-                WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
-                Enemy enemy = colliderIter.GetComponentInParent<Enemy>();
-                if(mover != null)
-                {
                 int enemySide = (int)(Mathf.Sign(mover.transform.position.x - transform.position.x));
-                    if(_facingDirection != enemySide) return;
-          
-                    enemy.DropWeapon();
-                    Vector2 knockBackVector = new Vector2(enemy.transform.position.x - transform.position.x,0);
-                    enemy.mover.AddKnockBackImpact(knockBackVector, 40);
-                }
+                if(_facingDirection != enemySide) return;
+
+
+                enemy.DropWeapon();
+                Vector2 knockBackVector = new Vector2(enemy.transform.position.x - transform.position.x,0);
+                enemy.mover.AddKnockBackImpact(knockBackVector, 40);
             }
+        }
     }
     
     
