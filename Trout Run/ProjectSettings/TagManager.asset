@@ -9,6 +9,7 @@ TagManager:
   - TicketManager
   - Door
   - HUD
+  - Shootable
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - R_Bullets
   - R_Explosions
   - R_3DBackground
-  - 
+  - Projectiles
   - 
   - 
   - Player

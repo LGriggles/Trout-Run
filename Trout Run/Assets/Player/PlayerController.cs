@@ -4,8 +4,12 @@ using System.Collections;
 
 public class PlayerController : WeaponHolder
 {
+    //Collision results array
+    Collider2D[] _collisionResults = new Collider2D[100];
 
-    Collider2D[] collisionResults = new Collider2D[100];
+    bool _directionLock = false;
+
+    public bool _playerIsShooting = false;
 
     //Player hollistic state
     enum PlayerStates
@@ -17,12 +21,9 @@ public class PlayerController : WeaponHolder
         GROUNDLOCK
     }
     PlayerStates _playerState;
-    
+    public Weapon _drillShot;
     //Levitation
     public bool _levitatedThisJump;
-
-
-
     struct DodgingStruct
     {
         //Dodging
@@ -32,44 +33,47 @@ public class PlayerController : WeaponHolder
         //Ground dodging
         public KnockBack groundDodgeKnockBack;
     }
-    
     DodgingStruct _dodging;
-    
+
     //Sprite stuff
     private Animator _anim;
     private SpriteRenderer _myRenderer;
-    public GameObject sprite;
+    public GameObject _sprite;
     private GameObject _arm;
-    
+
     /* SLAMMIN CONTROL STICK STUFF :LEE
     float moveDir;
     bool _readyToSlamStick = true;
     public bool _running = false;*/
     Vector2 _inputMovementAxis = new Vector2();
     Vector2 _moveVector = new Vector2();
-    
-    public float normalSpeed = 32;
-    public float gimpedSpeed = 24;
+
+    public float _normalSpeed = 32;
+    public float _gimpedSpeed = 24;
     private float _speed;
-    public float speed { get { return _speed; } }
+    public float Speed { get { return _speed; } }
 
     private float _tempDrag, _tempGrav, _tempGrdAtt, _tempUngrdSpeed;
 
     bool _hasDoubleJump = false;
-    public float jumpForce = 0.5f;
+    float _jumpForce = 8f;
+    public float JumpForce
+    {
+        get { return _jumpForce; }
+        set { _jumpForce = value; }
+    }
+
     private bool _pickup = false; // flag for when pressed "pickup" button
-    private bool _trig = false; // flag for when trigger buttons are pressed in
     private bool _resurrectDeadOnPlanetJupiter = false; // flag for the levitate co-routine to stop touching itself at night
     private bool _immunity = false; // flag for temporary immunity upon being hit
     public bool immunity { get { return _immunity; } }
 
     private int _layPickup;
     private int _layEnemy;
-    
+
     private Vector2 _weaponDirection = Vector2.right;
     public Vector2 weaponDirection { get { return _weaponDirection; } }
     private Vector2 throwForce;
-    
 
     void Awake()
     {
@@ -80,11 +84,16 @@ public class PlayerController : WeaponHolder
         _layPickup = LayerMask.NameToLayer("IgnoreAllButPlayer");
         _layEnemy = LayerMask.NameToLayer("Enemy");
         myTeam = Team.PLAYER;
-        _myRenderer = sprite.GetComponent<SpriteRenderer>();
+        _myRenderer = _sprite.GetComponent<SpriteRenderer>();
         //Set up dodging
         _dodging._curDodgeTime = 0;
         _dodging._executedDodge = false;
         _dodging._inputPeriod = false;
+    }
+
+    public void Start()
+    {
+        _drillShot.Pickup(this, new Vector2(0.3f, 0.1f));
     }
 
     public void reAwaken()
@@ -101,94 +110,78 @@ public class PlayerController : WeaponHolder
         _mover.groundAttraction = _tempGrdAtt;
         _mover.minUngroundingSpeed = _tempUngrdSpeed;
         LevelController.Reset();
+
     }
-    
+
     //When this is called the player can shoot
     void UpdateAllowShooting()
     {
         // SHOOTING THINGS
-        if( _weapon != null)
+        if (_weapon != null)
         {
             // Aim the gun based on direction pressed (temporary - will need some way of making this generic for all weapons)
-            if(Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+            if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
             {
-                if(!_trig)
+                if (!_directionLock)
                 {
-                    _weaponDirection = new Vector2(Input.GetAxis ("Horizontal"), Input.GetAxis ("Vertical"));
-                    _weapon.SetDirection(_weaponDirection);
-                    _arm.transform.localRotation = _weapon.transform.localRotation;
+                    _weaponDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
                 }
             }
-            
+
             // Shoot the weapon
-            if(Input.GetButtonDown("Shoot")) _weapon.ShootTap();
-            if(Input.GetButton ("Shoot")) _weapon.ShootHold();
-            if(Input.GetButtonUp ("Shoot")) _weapon.ShootRelease();
+            if (Input.GetButtonDown("Shoot")) _weapon.ShootTap(); _playerIsShooting = true;
+            if (Input.GetButton("Shoot")) _weapon.ShootHold(); _playerIsShooting = true;
+            if (Input.GetButtonUp("Shoot")) _weapon.ShootRelease(); _playerIsShooting = true;
         }
         else
         {
+            // Aim the gun based on direction pressed (temporary - will need some way of making this generic for all weapons)
+            if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+            {
+                if (!_directionLock)
+                {
+                    _weaponDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+                }
+            }
+
             // aint got no weapon :(
-            if(Input.GetButtonDown("Shoot")) DisarmEnemy();
+            if (Input.GetButtonDown("Shoot"))
+            {
+                _drillShot.ShootTap();
+            }
         }
     }
-    
+
     void UpdateStateNormal()
     {
         UpdateAllowShooting();
-        if(_mover.isGrounded)
+        if (_mover.isGrounded)
         {
-            _speed = normalSpeed;
+            _speed = _normalSpeed;
             _dodging._curDodgeTime = 0;
             _levitatedThisJump = false;
         }
         // Few little stuff for debugging
         // ESCAPE!!!!
-        if(Input.GetKeyDown(KeyCode.Escape))Application.Quit();
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
         //if(Input.GetKeyDown(KeyCode.R)) MiniProfiler.Reset();
-        //MiniProfiler.AddMessage ("Velocity " + _mover.velocity + "\nGround " + _mover.isGrounded);
-        
-        
+
+
         // ACTUAL UPDATE BEGINS HERE!!!!
         // Movement
         // Player control here!
-        
+
         _moveVector.x = Input.GetAxis("Horizontal") * _speed;
         _mover.Move(_moveVector); // move
-        
-        if(_moveVector.x > 0.05f)
-        {
 
-            if(!_trig)
-            {
-                _facingDirection = 1;
-            }
-            _arm.transform.localPosition = new Vector3(Mathf.Abs(_arm.transform.localPosition.x), 
-            _arm.transform.localPosition.y, _arm.transform.localPosition.z);
-        }
-        else if(_moveVector.x < -0.05f)
+        if (Input.GetButtonDown("Jump"))
         {
-            if(!_trig)
+            if (Input.GetAxis("Vertical") <= -0.5f && _mover.onPlatform) _mover.DropThroughPlatform();
+            else
             {
-                _facingDirection = -1;
-            }
-            _arm.transform.localPosition = new Vector3(-Mathf.Abs(_arm.transform.localPosition.x), 
-            _arm.transform.localPosition.y, _arm.transform.localPosition.z);
-        }
-
-        if(Input.GetAxis("Vertical") > 0.25f && !_mover.isGrounded)
-        {
-            print("fall");
-            GetComponent<Rigidbody2D>().AddForce(new Vector2(0,5));
-        }
-
-        if(Input.GetButtonDown("Jump"))
-        {
-            if(Input.GetAxis("Vertical") <= -0.5f && _mover.onPlatform) _mover.DropThroughPlatform();
-            else 
-            {
-                if(_mover.isGrounded)
+                if (_mover.isGrounded)
                 {
-                    _mover.Jump (jumpForce); // jump
+                    _mover.Jump(_jumpForce); // jump
                 }
                 else
                 {
@@ -196,94 +189,78 @@ public class PlayerController : WeaponHolder
                 }
             }
         }
-        if(Input.GetButtonUp ("Jump"))
+        if (Input.GetButtonUp("Jump"))
         {
             _mover.endExtendedJump();
         }
-        
-        
-        if(Input.GetButtonDown ("Pickup") && !_pickup)
+
+
+        if (Input.GetButtonDown("Pickup") && !_pickup)
         {
-            if(_weapon == null) StartCoroutine(PickupWeapon());
-            else DropWeapon ();
+            if (_weapon == null) StartCoroutine(PickupWeapon());
+            else DropWeapon();
         }
 
-        else if(Input.GetButtonDown("Special") && !_dodging._executedDodge && !_dodging._inputPeriod)
+        else if (_mover.isGrounded == false &&  Input.GetButtonDown("Jump") && !_dodging._executedDodge && !_dodging._inputPeriod)
         {
             StartCoroutine(DodgeLeniency(0.2f));
         }
 
         //DODGING STUFF
-        if(!_mover.isGrounded && _dodging._inputPeriod == true)
+        if (!_mover.isGrounded && _dodging._inputPeriod == true)
         {
             //Do air dodging, this must be before the levitation stuff as that's for if you press specially neaturally
-            if(Input.GetAxis("Horizontal") > 0.30f)
+            if (Input.GetAxis("Horizontal") > 0.30f)
             {
                 //Right
                 _mover.RemoveAllMomentum();
-                _mover.AddKnockBackImpact(new Vector2(1,0.4f),200);
+                _mover.AddKnockBackImpact(new Vector2(1, 0.4f), 200);
                 _playerState = PlayerStates.AIRDODGING;
                 _dodging._curDodgeTime = 50;
                 _dodging._executedDodge = true;
             }
-            else if(Input.GetAxis("Horizontal") < -0.30f)
+            else if (Input.GetAxis("Horizontal") < -0.30f)
             {
                 //Left
                 _mover.RemoveAllMomentum();
-                _mover.AddKnockBackImpact(new Vector2(-1,0.4f),200);
+                _mover.AddKnockBackImpact(new Vector2(-1, 0.4f), 200);
                 _playerState = PlayerStates.AIRDODGING;
                 _dodging._curDodgeTime = 50;
                 _dodging._executedDodge = true;
             }
         }
-        else if(_mover.isGrounded && _dodging._inputPeriod == true)
+        else if (_mover.isGrounded && _dodging._inputPeriod == true)
         {
-        if(Input.GetAxis("Horizontal") > 0.20f)
-        {
-            //Right
-            _playerState = PlayerStates.GROUNDDODGING;
-            _mover.AddKnockBackImpact(new Vector2(1,0),200);
-            _dodging._curDodgeTime = 25;
-        }
-        else if(Input.GetAxis("Horizontal") < -0.20f)
-        {
-            //Left
-            _playerState = PlayerStates.GROUNDDODGING;
-            _mover.AddKnockBackImpact(new Vector2(-1,0),200);
-            _dodging._curDodgeTime = 25;
-        }
-        }
-
-        if(Input.GetAxis("Trigger") < 0.5f && Input.GetAxis("Trigger") > -0.5f )
-        {
-            _trig = false;
-        }
-
-        if(!_mover.isGrounded) //Isn't on the floor
-        {
-            if(!_levitatedThisJump && (Input.GetAxis("Trigger") >= 0.5f || Input.GetAxis("Trigger") <= -0.5f))
+            if (Input.GetAxis("Horizontal") > 0.20f)
             {
-                if (_trig == false)
-                {
-                    _playerState = PlayerStates.LEVITATION;
-                    _trig = true;
-                    _mover.RemoveAllMomentum();
-                    _levitatedThisJump = true;
-                }
+                //Right
+                _playerState = PlayerStates.GROUNDDODGING;
+                _mover.AddKnockBackImpact(new Vector2(1, 0), 200);
+                _dodging._curDodgeTime = 25;
+            }
+            else if (Input.GetAxis("Horizontal") < -0.20f)
+            {
+                //Left
+                _playerState = PlayerStates.GROUNDDODGING;
+                _mover.AddKnockBackImpact(new Vector2(-1, 0), 200);
+                _dodging._curDodgeTime = 25;
             }
         }
-        else if((Input.GetAxis("Trigger") >= 0.5f || Input.GetAxis("Trigger") <= -0.5f)) //Is on the floor
+
+        if (Input.GetAxis("Trigger") < 0.5f && Input.GetAxis("Trigger") > -0.5f)
         {
-            if (_trig == false)
-            {
-                _trig = true;
-            }
+            UnlockDirection();
         }
-        
+
+        if ((Input.GetAxis("Trigger") >= 0.5f || Input.GetAxis("Trigger") <= -0.5f)) //Is on the floor
+        {
+            LockDirection();
+        }
+
         //Time until can dodge again
-        if(_dodging._curDodgeTime > 0)
+        if (_dodging._curDodgeTime > 0)
         {
-            if(_mover.isGrounded)
+            if (_mover.isGrounded)
             {
                 _dodging._curDodgeTime -= 50 * Time.deltaTime;
             }
@@ -294,41 +271,41 @@ public class PlayerController : WeaponHolder
             _dodging._executedDodge = false;
         }
     }
-    
+
     void UpdateStateLevitation()
     {
         //_myRenderer.color = new Color (1.0f, 0.5f, 1.0f, 1.0f);
         UpdateAllowShooting();
         _levitatedThisJump = true;
         if (!_resurrectDeadOnPlanetJupiter)
-        StartCoroutine(LevitationStateOver());
+            StartCoroutine(LevitationStateOver());
         _mover.RemoveAllMomentum();
-        if(Input.GetAxis("Horizontal") > 0.30f && Input.GetButtonDown("Special"))
+        if (Input.GetAxis("Horizontal") > 0.30f && Input.GetButtonDown("Special"))
         {
             //Right
-            _mover.AddKnockBackImpact(new Vector2(1,0.4f),200);
+            _mover.AddKnockBackImpact(new Vector2(1, 0.4f), 200);
             _playerState = PlayerStates.AIRDODGING;
             _dodging._curDodgeTime = 50;
             _dodging._executedDodge = true;
         }
-        else if(Input.GetAxis("Horizontal") < -0.30f && Input.GetButtonDown("Special"))
+        else if (Input.GetAxis("Horizontal") < -0.30f && Input.GetButtonDown("Special"))
         {
             //Left
-            _mover.AddKnockBackImpact(new Vector2(-1,0.4f),200);
+            _mover.AddKnockBackImpact(new Vector2(-1, 0.4f), 200);
             _playerState = PlayerStates.AIRDODGING;
             _dodging._curDodgeTime = 50;
             _dodging._executedDodge = true;
         }
-        else if(Input.GetButtonDown("Special") || (Input.GetAxis("Trigger") >= 0.5f || Input.GetAxis("Trigger") <= -0.5f) && !_trig)
+        else if (Input.GetButtonDown("Special") || (Input.GetAxis("Trigger") >= 0.5f || Input.GetAxis("Trigger") <= -0.5f) && !_directionLock)
         {
             //It's over player
             _playerState = PlayerStates.NORMAL;
         }
     }
-    
+
     IEnumerator LevitationStateOver()
     {
-        if(_playerState == PlayerStates.LEVITATION && !_resurrectDeadOnPlanetJupiter)
+        if (_playerState == PlayerStates.LEVITATION && !_resurrectDeadOnPlanetJupiter)
         {
             _resurrectDeadOnPlanetJupiter = true;
             yield return new WaitForSeconds(0.5f);
@@ -336,25 +313,25 @@ public class PlayerController : WeaponHolder
         }
         _resurrectDeadOnPlanetJupiter = false;
     }
-    
+
     void UpdateStateGroundDodging()
     {
         //UpdateAllowShooting();
         bool isItOverMummy = false;
         UpdateAllowShooting();
-        if(Input.GetButtonDown ("Pickup") && !_pickup)
+        if (Input.GetButtonDown("Pickup") && !_pickup)
         {
-            if(_weapon == null) StartCoroutine(PickupWeapon());
-            else DropWeapon ();
+            if (_weapon == null) StartCoroutine(PickupWeapon());
+            else DropWeapon();
         }
-        
-        if(_dodging._curDodgeTime > 0)
+
+        if (_dodging._curDodgeTime > 0)
         {
             _dodging._curDodgeTime -= 50 * Time.deltaTime;
         }
         else
         {
-            if(!isItOverMummy)
+            if (!isItOverMummy)
             {
                 StartCoroutine(GroundDodgeOver());
                 isItOverMummy = true;
@@ -365,57 +342,45 @@ public class PlayerController : WeaponHolder
 
     void UpdateStateGroundLock()
     {
-        _speed = gimpedSpeed;
+        _speed = _gimpedSpeed;
         UpdateAllowShooting();
-        if(!_mover.isGrounded || (Input.GetAxis("Trigger") < 0.5f && Input.GetAxis("Trigger") > -0.5f))
+        if (!_mover.isGrounded || (Input.GetAxis("Trigger") < 0.5f && Input.GetAxis("Trigger") > -0.5f))
         {
             _playerState = PlayerStates.NORMAL;
         }
-        if(Input.GetButtonDown("Jump"))
+        //Drop through platforms
+        if (Input.GetButtonDown("Jump"))
         {
-            if(Input.GetAxis("Vertical") <= -0.5f && _mover.onPlatform) 
+            if (Input.GetAxis("Vertical") <= -0.5f && _mover.onPlatform)
             {
                 _mover.DropThroughPlatform();
                 _playerState = PlayerStates.NORMAL;
             }
-            else 
+            else
             {
-                _mover.Jump(jumpForce);
+                _mover.Jump(_jumpForce);
                 _playerState = PlayerStates.NORMAL;
             }
         }
     }
-    
+
     IEnumerator GroundDodgeOver()
     {
         yield return new WaitForSeconds(0.05f);
-        if(_playerState == PlayerStates.GROUNDDODGING)
+        if (_playerState == PlayerStates.GROUNDDODGING)
         {
             _playerState = PlayerStates.NORMAL;
         }
     }
-    
+
     void UpdateStateAirDodging()
     {
         UpdateAllowShooting();
-        if(((Input.GetAxis("Trigger") >= 0.5f || Input.GetAxis("Trigger") <= -0.5f) && !_trig) && !_mover.isGrounded && !_levitatedThisJump)
-        {
-            _playerState = PlayerStates.LEVITATION;
-            _mover.RemoveAllMomentum();
-             _levitatedThisJump = true;
-            _trig = true;
-        }
-        
-        
-        ////Still can pick up and throw weapons because you're hot shit
-        //if(Input.GetButtonDown ("Pickup") && !_pickup)
-        //{
-            if(_weapon == null) StartCoroutine(PickupWeapon());
-            //else DropWeapon ();
-        //}
-        
+
+        if (_weapon == null) StartCoroutine(PickupWeapon());
+
         //Hit the land, you gotta wait to move again bruh
-        if(_mover.isGrounded)
+        if (_mover.isGrounded)
         {
             _dodging._curDodgeTime = 0;
             _mover.RemoveAllMomentum();
@@ -426,11 +391,11 @@ public class PlayerController : WeaponHolder
             _moveVector.x = Input.GetAxis("Horizontal") * _speed;
             _mover.Move(_moveVector); // move
         }
-        
+
         //Recover the dodging powerrrrrr
-        if(_dodging._curDodgeTime > 0)
+        if (_dodging._curDodgeTime > 0)
         {
-            if(_mover.isGrounded)
+            if (_mover.isGrounded)
             {
                 _dodging._curDodgeTime -= 50 * Time.deltaTime;
             }
@@ -442,41 +407,66 @@ public class PlayerController : WeaponHolder
             _dodging._curDodgeTime = 0;
         }
     }
-    
-    
+
+
     //Hit the ground, delay until can do anything again
     IEnumerator AirDodgingHitGround()
     {
         _levitatedThisJump = false;
         yield return new WaitForSeconds(0.02f);
         _dodging._curDodgeTime = 0;
-        if(_playerState == PlayerStates.AIRDODGING)
+        if (_playerState == PlayerStates.AIRDODGING)
         {
             _playerState = PlayerStates.NORMAL;
         }
     }
-    
+
     void FixedUpdate()
     {
-        
+        if (!_directionLock)
+        {
+            if (_moveVector.x > 0.05f)
+            {
+                _facingDirection = 1;
+            }
+            else if (_moveVector.x < -0.05f)
+            {
+                _facingDirection = -1;
+            }
+        }
+
+        _arm.transform.localPosition = new Vector3(Mathf.Abs(_arm.transform.localPosition.x) * _facingDirection,
+        _arm.transform.localPosition.y, _arm.transform.localPosition.z);
+
+        if (_weapon != null)
+        {
+            _weapon.SetDirection(_weaponDirection);
+            _arm.transform.localRotation = _weapon.transform.localRotation;
+        }
+        else
+        {
+            _drillShot.SetDirection(_weaponDirection);
+            _arm.transform.localRotation = _drillShot.transform.localRotation;
+        }
+        _playerIsShooting = false;
     }
     // Update is called once per frame
-    void Update ()
+    void Update()
     {
-        switch(_playerState)
+        switch (_playerState)
         {
             case PlayerStates.NORMAL:
                 UpdateStateNormal();
                 break;
-                
+
             case PlayerStates.AIRDODGING:
                 UpdateStateAirDodging();
                 break;
-                
+
             case PlayerStates.LEVITATION:
                 UpdateStateLevitation();
                 break;
-                
+
             case PlayerStates.GROUNDDODGING:
                 UpdateStateGroundDodging();
                 break;
@@ -486,39 +476,40 @@ public class PlayerController : WeaponHolder
                 break;
         }
         UpdateAnimation();
+        MiniProfiler.AddMessage("wepdir" + _weaponDirection);
         MiniProfiler.AddMessage("Stick" + Input.GetAxis("Horizontal"));
         MiniProfiler.AddMessage("Direction " + _facingDirection);
         MiniProfiler.AddMessage("Player state" + _playerState);
     }
-    
+
     void DropWeapon()
     {
-        throwForce = _mover.velocity + new Vector2(Input.GetAxis ("Horizontal") * 12, Input.GetAxis ("Vertical") * 12);
-        _weapon.Throw (throwForce, true);
+        throwForce = _mover.velocity + new Vector2(Input.GetAxis("Horizontal") * 12, Input.GetAxis("Vertical") * 12);
+        _weapon.Throw(throwForce, true);
         _weapon = null;
     }
-    
+
     void LoseWeapon()
     {
-        _weapon.Lose ();
+        _weapon.Lose();
         _weapon = null;
     }
-    
+
     public void GetHit()
     {
         _immunity = true;
         StartCoroutine(HitFlash());
-        if(_weapon != null) LoseWeapon();
+        if (_weapon != null) LoseWeapon();
     }
 
     IEnumerator HitFlash()
     {
         for (int i = 0; i < 5; i++)
         {
-        _myRenderer.color = new Color (1.0f, 0.4f, 0.4f, 0.7f);
-        yield return new WaitForSeconds(0.1f);
-        _myRenderer.color = new Color (1.0f, 1.0f, 1.0f, 1.0f);
-        yield return new WaitForSeconds(0.1f);
+            _myRenderer.color = new Color(1.0f, 0.4f, 0.4f, 0.7f);
+            yield return new WaitForSeconds(0.1f);
+            _myRenderer.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+            yield return new WaitForSeconds(0.1f);
         }
         _immunity = false;
     }
@@ -539,36 +530,37 @@ public class PlayerController : WeaponHolder
 
     private void DisarmEnemy()
     {
-            int size = Physics2D.OverlapCircleNonAlloc(transform.position,3,collisionResults,1 << LayerMask.NameToLayer("Enemy"));
-            for(int i = 0; i < size; i++)
+        int size = Physics2D.OverlapCircleNonAlloc(transform.position, 3, _collisionResults, 1 << LayerMask.NameToLayer("Enemy"));
+        for (int i = 0; i < size; i++)
+        {
+            Collider2D colliderIter = _collisionResults[i];
+            Mover mover = colliderIter.GetComponentInParent<Mover>();
+            WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
+            Enemy enemy = colliderIter.GetComponentInParent<Enemy>();
+            if (mover != null)
             {
-                Collider2D colliderIter = collisionResults[i];
-                Mover mover = colliderIter.GetComponentInParent<Mover>();
-                WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
-                Enemy enemy = colliderIter.GetComponentInParent<Enemy>();
-                if(mover != null)
-                {
                 int enemySide = (int)(Mathf.Sign(mover.transform.position.x - transform.position.x));
-                    if(_facingDirection != enemySide) return;
-          
-                    enemy.DropWeapon();
-                    Vector2 knockBackVector = new Vector2(enemy.transform.position.x - transform.position.x,0);
-                    enemy.mover.AddKnockBackImpact(knockBackVector, 40);
-                }
+                if (_facingDirection != enemySide) return;
+
+                enemy.DropWeapon();
+                Vector2 knockBackVector = new Vector2(enemy.transform.position.x - transform.position.x, 0);
+                enemy.mover.AddKnockBackImpact(knockBackVector, 40);
             }
+        }
     }
-    
-    
+
+
     void OnTriggerStay2D(Collider2D other)
     {
-        if(other.gameObject.layer == _layPickup)
+        if (other.gameObject.layer == _layPickup)
         {
-            if(_pickup) // if pressed pickup during last update...
+            if (_pickup) // if pressed pickup during last update...
             {
                 // Check for Weapon component in other to see if pickup is a weapon
                 Weapon weaponPickup = other.GetComponentInParent<Weapon>();
-                if(weaponPickup != null && _weapon == null)
+                if (weaponPickup != null && _weapon == null)
                 {
+                    weapon = weaponPickup;
                     weaponPickup.Pickup(this, new Vector2(0.3f, 0.1f));
                     weaponPickup.SetDirection(new Vector2(_facingDirection, 0));
                 }
@@ -593,14 +585,14 @@ public class PlayerController : WeaponHolder
             }
         }
     }
-    
-    private void UpdateAnimation ()
+
+    private void UpdateAnimation()
     {
-        if(Mathf.Sign(_anim.transform.localScale.x) != Mathf.Sign(_facingDirection))
+        if (Mathf.Sign(_anim.transform.localScale.x) != Mathf.Sign(_facingDirection))
         {
             _anim.transform.localScale = new Vector3(_anim.transform.localScale.x * -1, _anim.transform.localScale.y, _anim.transform.localScale.z);
         }
-        
+
         if (_mover.isGrounded)
         {
             if (_mover.velocity.x < 0.3 && _mover.velocity.x > -0.3)
@@ -610,7 +602,7 @@ public class PlayerController : WeaponHolder
                     _anim.Play("IdleUp");
                     _anim.speed = 1;
                 }
-                else 
+                else
                 {
                     _anim.Play("Idle1");
                     _anim.speed = 1;
@@ -637,5 +629,15 @@ public class PlayerController : WeaponHolder
             _anim.Play("Fall");
             _anim.speed = 1;
         }
+    }
+
+    public void LockDirection()
+    {
+        _directionLock = true;
+    }
+
+    public void UnlockDirection()
+    {
+        _directionLock = false;
     }
 }

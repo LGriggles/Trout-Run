@@ -17,7 +17,7 @@ public class ChargerShooter : ProjectileWeapon
     {
         _maxDurability = 8;
         ResetDurability();
-        _directions = WeaponDir.FOUR;
+        _directions = WeaponDir.HORIZONTAL;
         ParticleSystem[] children = GetComponentsInChildren<ParticleSystem>();
         foreach(ParticleSystem child in children)
         {

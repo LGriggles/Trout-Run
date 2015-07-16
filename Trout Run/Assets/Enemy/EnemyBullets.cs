@@ -29,9 +29,6 @@ public class EnemyBullets : MonoBehaviour
 		pSystem.Emit(position, velocity, pSystem.startSize, pSystem.startLifetime, pSystem.startColor);
 	}
 
-
-
-
 	private void Flash()
 	{
 		Color32 colour = material.GetColor("_TintColor");

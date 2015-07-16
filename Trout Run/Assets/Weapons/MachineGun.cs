@@ -8,7 +8,7 @@ public class MachineGun : ProjectileWeapon
 	private bool _shooting = false;
 	private Mover _mover; // mover of whoever is holding this gun
 
-
+    public GameObject prefabBase;
 
     public override WeaponName GetName() { return WeaponName.MACHINE_GUN;} // get name as enum (can do .ToString() to get as a string if needed)
 	protected override void OnAwake(){}
@@ -16,14 +16,18 @@ public class MachineGun : ProjectileWeapon
 	// Use this for initialization
 	protected override void Init () // called from base class?
 	{
-		_strength = 1;
+		_strength = 5;
         _maxDurability = 160;
         ResetDurability();
 		_directions = WeaponDir.EIGHT;
 
+
+        _playerBulletParticles.InstantiatePool(200, prefabBase);
+        _enemyBulletsParticles.InstantiatePool(200, prefabBase);
+
 		// Deactivate bullets till weapon picked up
-		_playerBulletParticles.gameObject.SetActive(false);
-		_enemyBulletsParticles.gameObject.SetActive(false);
+		//_playerBulletParticles.gameObject.SetActive(false);
+		//_enemyBulletsParticles.gameObject.SetActive(false);
 	}
 
 	public override void ApplyKnockback (Mover mover, Vector2 impactDirection)
@@ -111,7 +115,8 @@ public class MachineGun : ProjectileWeapon
 			velo.x += _mover.velocity.x;
 
 		// Acually emit the particle
-		_bullets.Emit(pos, velo, _owner);
+        _bullets.Shoot( pos, velo * 2, _owner);
+		//_bullets.Emit(pos, velo, _owner);
         LoseDurability(1);
 	}
 }

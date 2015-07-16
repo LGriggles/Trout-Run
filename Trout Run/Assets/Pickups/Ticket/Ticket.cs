@@ -15,7 +15,7 @@ public class Ticket : Pickup {
         _myAnimator = GetComponent<Animator>();
         _myRenderer = GetComponent<SpriteRenderer>();
         StopCoroutine("CountdownToDeath");
-        StopCoroutine("Ceath");
+        StopCoroutine("Death");
         _myRenderer.color = new Color (1.0f, 1.0f, 1.0f, 1.0f);
         RandomTicket();
         StartCoroutine(CountdownToDeath(5.0f + (Random.value * 2)));

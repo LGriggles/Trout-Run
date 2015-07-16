@@ -17,6 +17,12 @@ public class WeaponHolder : MonoBehaviour {
         ENEMY,
     };
 
+    public virtual void DropWeapon()
+    {
+        _weapon.DropMe();
+        _weapon = null;
+    }
+
     public Team myTeam;
     //Identifies the team that the holder is on
 	// Use this for initialization

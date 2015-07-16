@@ -26,22 +26,32 @@ public class CameraController : MonoBehaviour
 	void LateUpdate () 
 	{
 		Vector3 newPos = _playerTransform.position + offset;
-
-
+        if (player._playerIsShooting)
+        {
+            newPos.x = Mathf.Lerp(transform.position.x, _playerTransform.position.x + (2 * (player.facingDirection)), 8 * Time.deltaTime);
+        }
 
 		if(!_playerMover.isGrounded)
 		{
 			_dampingOn = true;
+            
             newPos.y = Mathf.Lerp(transform.position.y, newPos.y, 0.5f * Time.deltaTime);
 
+            newPos.x = Mathf.Lerp(transform.position.x, _playerTransform.position.x + (2 * (player.facingDirection)), 3 * Time.deltaTime);
 		}
-		else if(_dampingOn)
-		{
-			if(Mathf.Abs (transform.position.y - newPos.y) <= 0.01f) _dampingOn = false;
+        else if (_dampingOn)
+        {
+            if (Mathf.Abs(transform.position.y - newPos.y) <= 0.01f) _dampingOn = false;
 
-			newPos.y = Mathf.Lerp(transform.position.y, newPos.y, damping * Time.deltaTime);
+            newPos.y = Mathf.Lerp(transform.position.y, newPos.y, damping * Time.deltaTime);
 
-		}
+            newPos.x = Mathf.Lerp(transform.position.x, _playerTransform.position.x + (2 * (player.facingDirection)), 1 * Time.deltaTime);
+        }
+        else
+        {
+
+            newPos.x = Mathf.Lerp(transform.position.x, _playerTransform.position.x + (2 * (player.facingDirection)), 1 * Time.deltaTime);
+        }
 		transform.position = newPos;
 	}
 }
