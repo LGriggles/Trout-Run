@@ -545,7 +545,7 @@ public class PlayerController : WeaponHolder
             Collider2D colliderIter = collisionResults[i];
             Mover mover = colliderIter.GetComponentInParent<Mover>();
             WeaponHolder holder = colliderIter.GetComponentInParent<WeaponHolder>();
-            EnemyOld enemy = colliderIter.GetComponentInParent<EnemyOld>();
+            Enemy enemy = colliderIter.GetComponentInParent<Enemy>();
             if(mover != null)
             {
                 int enemySide = (int)(Mathf.Sign(mover.transform.position.x - transform.position.x));

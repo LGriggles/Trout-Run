@@ -197,7 +197,7 @@ public class Mover : MonoBehaviour
 		//MiniProfiler.AddMessage("Top " + _collidedTop + "\nBottom " + _collidedBottom + "\nSides " + _collidedSides);
 		//MiniProfiler.AddMessage("Jumped = " + _jumped);
 		//MiniProfiler.AddMessage("Grounded = " + _grounded);
-		MiniProfiler.AddMessage("On Platform = " + _onPlatform);
+		//MiniProfiler.AddMessage("On Platform = " + _onPlatform);
         //MiniProfiler.AddMessage("Collide Plats " + _collideWithPlatforms + "\nFalling Through " + _fallingThroughPlatform);
 	}
 	

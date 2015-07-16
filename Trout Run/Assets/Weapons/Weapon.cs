@@ -96,9 +96,9 @@ public abstract class Weapon : MonoBehaviour
 	public virtual void ApplyKnockback(Mover mover, Vector2 impactDirection) {} // called when bullets hit, melee weapons make contact etc
 
 
-	public void Pickup(EnemyOld enemy){Pickup(enemy, Vector2.zero);}
+	public void Pickup(Enemy enemy){Pickup(enemy, Vector2.zero);}
 	public void Pickup(PlayerController player){Pickup(player, Vector2.zero);}
-	public void Pickup(EnemyOld enemy, Vector2 offset)
+	public void Pickup(Enemy enemy, Vector2 offset)
 	{
 		// Set Enemy
 		enemy.weapon = this;

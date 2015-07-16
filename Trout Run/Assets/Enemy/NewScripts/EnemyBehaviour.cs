@@ -45,7 +45,7 @@ public class EnemyBehaviour : MonoBehaviour
         else if (_myEnemy.HasAbilities(EnemyProps.WALKS))
         {
             EnemyPath path = EnemyPathfinder.FindPath(_myEnemy, target);
-            
+
             if (path == null) return false;
 
             _myTask = new ETWalkTo(_myEnemy, path, target);

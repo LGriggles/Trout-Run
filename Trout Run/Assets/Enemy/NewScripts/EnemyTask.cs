@@ -18,12 +18,17 @@ public abstract class EnemyTask
 //! Walk to a location
 public class ETWalkTo : EnemyTask
 {
+    enum MoveState { IDLE, WALKING, CLIMBING, JUMPING } //jumping refers to falling through plats as well
+    MoveState _moveState = MoveState.IDLE;
+
     EnemyPath _path;
     Vector2 _target;
 
     int _curNode;
-    float _nodeTarget; //!< Target pos moving to from this node - note float rather than vector as moves either left-right (on floor) ot up-down (on ladder), as dictated by _moveDir
-    Vector2 _moveDir;
+    Vector2 _nodeStart;
+    Vector2 _nodeEnd;
+    float _moveDir; //!< 1 for up / right and -1 for down / left
+    float _platDelay = 0; //!< Delay to stop chaining platforms too fast
     
 
 
@@ -36,33 +41,122 @@ public class ETWalkTo : EnemyTask
         _curNode = 0;
 
         //_path.DebugPrint();
+        _path.NormalizeConnections(new Vector2(1, 1));
         MoveToNode(0);
     }
 
 
-    public override State DoTask()
+    bool ReachedNodeEndX()
     {
-        bool nodeEnd = false;
-
-        if (_moveDir.y == 0)
+        if (_moveDir > 0)
         {
-            _myEnemy.Walk(_moveDir.x);
-            nodeEnd = ((_moveDir.x > 0 && _myEnemy.Position.x >= _nodeTarget) || (_moveDir.x < 0 && _myEnemy.Position.x <= _nodeTarget));
+            if (_myEnemy.Position.x >= _nodeEnd.x) return true;
         }
         else
         {
-            _myEnemy.UseLadder(_moveDir.y, _path[_curNode]);
-            nodeEnd = ((_moveDir.y > 0 && _myEnemy.Position.y >= _nodeTarget) || (_moveDir.y < 0 && _myEnemy.Position.y <= _nodeTarget));
+            if (_myEnemy.Position.x <= _nodeEnd.x) return true;
         }
+        return false;
+    }
 
-
-
-        if (nodeEnd)
+    bool ReachedNodeEndY()
+    {
+        if (_moveDir > 0)
         {
-            if (_curNode == _path.Size - 1) return State.COMPLETE;
-            else MoveToNode(_curNode + 1);
+            if (_myEnemy.Position.y >= _nodeEnd.y) return true;
         }
+        else
+        {
+            if (_myEnemy.Position.y <= _nodeEnd.y) return true;
+        }
+        return false;
+    }
 
+
+
+    public override State DoTask()
+    {
+        PathNode curPathNode = _path[_curNode];
+
+        switch (_moveState)
+        {
+            // IDLE - Work out what state should be based on current level node
+            case MoveState.IDLE:
+                if (curPathNode.levelNode.LevelType == LevelNode.Type.LADDER)
+                {
+                    _moveState = MoveState.CLIMBING;
+                }
+                else
+                {
+                    _moveState = MoveState.WALKING;
+                }
+
+                break;
+
+
+            // WALKING - Walk left or right to destination
+            case MoveState.WALKING:
+                if (ReachedNodeEndX())
+                {
+                    // If platform, may need to jump if end point higher or lower than current pos
+                    if (curPathNode.connection == LevelNode.Direction.UP || curPathNode.connection == LevelNode.Direction.DOWN)
+                    {
+                        // Above or below? = JUMP or DROP
+                        _moveState = MoveState.JUMPING;
+                        _platDelay = 0.2f;
+                        if (curPathNode.connection == LevelNode.Direction.UP) _myEnemy.Jump();
+                        else _myEnemy.DropThroughPlatform();
+                    }
+                    else
+                    {
+                        _moveState = MoveState.IDLE;
+                        if (_curNode == _path.Size - 1) return State.COMPLETE;
+                        else MoveToNode(_curNode + 1);
+                    }
+                }
+                else
+                {
+                    _myEnemy.Walk(_moveDir);
+                }
+
+                break;
+
+
+            // CLIMBING - Walk left or right to destination
+            case MoveState.CLIMBING:
+                if (ReachedNodeEndY())
+                {
+                    _moveState = MoveState.IDLE;
+                    if (_curNode == _path.Size - 1) return State.COMPLETE;
+                    else MoveToNode(_curNode + 1);
+                    
+                }
+                else
+                {
+                    _myEnemy.UseLadder(_moveDir, _path[_curNode].levelNode);
+                }
+
+                break;
+
+
+            // JUMPING - Jump up or fall through platform
+            case MoveState.JUMPING:
+                if (_platDelay > 0)
+                {
+                    _platDelay -= Time.deltaTime;
+                }
+                else
+                {
+                    if (_myEnemy.OnGround)
+                    {
+                        _moveState = MoveState.IDLE;
+                        if (_curNode == _path.Size - 1) return State.COMPLETE;
+                        else MoveToNode(_curNode + 1);
+                    }
+                }
+
+                break;
+        }
 
         return State.ONGOING;
     }
@@ -74,46 +168,33 @@ public class ETWalkTo : EnemyTask
     {
         _curNode = node;
         bool isLastNode = (_curNode == _path.Size - 1);
+        
 
-        // Calculate general direction to move in
-        if (isLastNode)
+        // Calculate start and end position
+        _nodeStart = _path[_curNode].entryPoint;    
+        if (isLastNode) _nodeEnd = _target;
+        else _nodeEnd = _path[_curNode+1].entryPoint;
+
+        // Calculate direction
+        switch (_path[_curNode].levelNode.LevelType)
         {
-            _moveDir = _target - _myEnemy.Position;
+            case LevelNode.Type.FLOOR:
+            case LevelNode.Type.PLATFORM:
+                if (_nodeEnd.x > _nodeStart.x) _moveDir = 1;
+                else _moveDir = -1;
+                
+                break;
+
+            case LevelNode.Type.LADDER:
+                if (_nodeEnd.y > _nodeStart.y) _moveDir = 1;
+                else _moveDir = -1;
+                
+                break;
+
         }
-        else
-        {
-            _moveDir = _path[_curNode + 1].Centre - _myEnemy.Position;
-        }
 
+       //Debug.Log("Moving to node " + node + "(" + _path[node].levelNode.LevelType.ToString() + "): Start = " + _nodeStart.ToString() + ", End = " + _nodeEnd.ToString());
 
-
-        // Change move dir to be in range of -1 to 1 on axis desired and calculate target
-        if (_path[_curNode].LevelType == LevelNode.Type.FLOOR)
-        {
-            _moveDir.x = Mathf.Sign(_moveDir.x);
-            _moveDir.y = 0;
-
-            if (isLastNode) _nodeTarget = _target.x;
-            else
-            {
-                if (_path[_curNode + 1].LevelType == LevelNode.Type.LADDER) _nodeTarget = _path[_curNode + 1].Centre.x;
-                else if (_moveDir.x > 0) _nodeTarget = _path[_curNode + 1].Left;
-                else _nodeTarget = _path[_curNode + 1].Right;
-            }
-        }
-        else if (_path[_curNode].LevelType == LevelNode.Type.LADDER)
-        {
-            _moveDir.x = 0;
-            _moveDir.y = Mathf.Sign(_moveDir.y);
-
-
-            if (isLastNode) _nodeTarget = _target.y;
-            else
-            {
-                if (_moveDir.y > 0) _nodeTarget = _path[_curNode].Top + 0.5f;//half size of enemy
-                else _nodeTarget = _path[_curNode].Bottom + 0.5f;//half size of enemy
-            }
-        }
     }
 }
 

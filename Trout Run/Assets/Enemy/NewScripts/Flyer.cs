@@ -11,6 +11,11 @@ public class Flyer : Enemy
         _flySpeed = 10;
     }
 
+    protected override void Spawn()
+    {
+
+    }
+
 	
 
    

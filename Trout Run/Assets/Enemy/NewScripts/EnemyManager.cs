@@ -51,7 +51,7 @@ public class EnemyManager : MonoBehaviour
         foreach (Collider2D c in colliders)
         {
             EnemyBehaviour b = c.GetComponent<EnemyBehaviour>();
-            if (b != null)
+            if (b != null && !_enemyBehavs.Contains(b))
             {
                 _enemyBehavs.Add(b);
             }

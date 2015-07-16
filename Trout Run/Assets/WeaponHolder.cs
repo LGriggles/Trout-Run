@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class WeaponHolder : MonoBehaviour {
+public abstract class WeaponHolder : MonoBehaviour 
+{
     public Weapon weapon { set { _weapon = value; } get { return _weapon; }}
     protected Weapon _weapon;
 
