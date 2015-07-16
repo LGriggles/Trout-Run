@@ -24,7 +24,7 @@ public class Drone : Enemy
         // Define abilities of this enemy type
         _abilities = (EnemyProps.WALKS | EnemyProps.JUMPS | EnemyProps.LADDERS);
 
-        _walkSpeed = 80;
+        _walkSpeed = 120;
         _jumpForce = 6;
 
         _maxHealth = 10;

@@ -225,3 +225,58 @@ public class ETFlyTo : EnemyTask
         return State.ONGOING;
     }
 }
+
+
+
+
+
+
+
+
+
+
+//! Always walk towards player
+public class ETChasePlayer : EnemyTask
+{
+    Transform _playerTrans; 
+
+    public ETChasePlayer(Enemy enemy)
+    {
+        _myEnemy = enemy;
+        _playerTrans = GameObject.FindGameObjectWithTag("Player").transform;        
+    }
+
+
+    public override State DoTask()
+    {
+        Vector2 playerPos = _playerTrans.position;
+        float dist = 0;
+
+        if(_myEnemy.HasAbilities(EnemyProps.WALKS))
+        {
+            float enemyToPlayer = playerPos.x - _myEnemy.Position.x;
+            dist = Mathf.Abs(enemyToPlayer);
+            if(dist > 2)
+            {
+                _myEnemy.Walk(Mathf.Sign(enemyToPlayer));
+            }
+
+        }
+        else if(_myEnemy.HasAbilities(EnemyProps.FLYS))
+        {
+            dist = Vector2.SqrMagnitude(playerPos - _myEnemy.Position);
+            if(dist > 4)
+            {
+                Vector2 dir = (playerPos - _myEnemy.Position).normalized;
+                _myEnemy.Fly(dir);
+            }
+        }
+        else
+        {
+            return State.FAILED;
+        }
+
+        return State.ONGOING;
+       
+    }
+}

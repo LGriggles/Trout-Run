@@ -58,6 +58,14 @@ public class EnemyBehaviour : MonoBehaviour
     }
 
 
+    // Helo moto
+    public bool ChasePlayer()
+    {
+        _myTask = new ETChasePlayer(_myEnemy);
+        return true;
+    }
+
+
 
 
 

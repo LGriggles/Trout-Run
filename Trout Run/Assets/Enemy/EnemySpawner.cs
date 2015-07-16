@@ -11,6 +11,8 @@ using System.Collections.Generic;
 
 public class EnemySpawner : MonoBehaviour 
 {
+    EnemyManager _enemyManager;
+
 	public int maxEnemies = 4; // max number at once - number instantiated controlled by each enemy setup's quantity
 	[SerializeField] public EnemySetup[] enemySetups;
 	public bool positionsRelative = false; // to centre of screen
@@ -33,6 +35,7 @@ public class EnemySpawner : MonoBehaviour
 	{
 		_mainCamera = GameObject.FindGameObjectWithTag("MainCamera").transform;
 		_layPlayer = LayerMask.NameToLayer("Player");
+        _enemyManager = FindObjectOfType<EnemyManager>();
 	}
 
 	// Use this for initialization
@@ -95,6 +98,13 @@ public class EnemySpawner : MonoBehaviour
 				_enemyCount += 1;
 				_nextEnemy += 1;
 				if(_nextEnemy >= _enemies.Count) _nextEnemy = 0;
+
+                // Tell yo boss
+                EnemyBehaviour behave = _enemies[n].GetComponentInChildren<EnemyBehaviour>();
+                if (behave == null) Debug.Log("But mom...");
+                else _enemyManager.EnemySpawned(behave);
+
+                // Return so doesn't bother trawling through other enemies in array
 				return;
 			}
 		}

@@ -17,7 +17,6 @@ public abstract class Enemy : WeaponHolder
     // To do with moving, probably will be different when merged with Lee's physics
     Vector2 _moveVector;
     protected Transform _transform;
-    //protected Mover _mover;
 
     // Imported from old enemy
     protected WeaponManager _weaponManager;
@@ -183,6 +182,7 @@ public abstract class Enemy : WeaponHolder
 
     IEnumerator HitFlash()
     {
+        SetAnim(Anim.HIT); ;
         for (int i = 0; i < 5; i++)
         {
             _myRenderer.color = new Color(1.0f, 0.4f, 0.4f, 0.7f);
@@ -228,6 +228,19 @@ public abstract class Enemy : WeaponHolder
     }
 
 
+    // Hath been functionated because probably wanna change stuff later
+    enum Anim { IDLE, WALK, HIT }
+    void SetAnim(Anim anim)
+    {
+        switch (anim)
+        {
+            case Anim.IDLE:     _anim.Play("Idle");     return;
+            case Anim.WALK:     _anim.Play("Walk");     return;
+            case Anim.HIT:      _anim.Play("Hit");      return;
+        }
+    }
+
+
   
 
     //------------------------------------------------//
@@ -237,6 +250,9 @@ public abstract class Enemy : WeaponHolder
     //------------------------------------------------//
     public virtual void Walk(float dir)
     {
+        SetAnim(Anim.WALK);
+        _facingDirection = dir;
+
         _moveVector = new Vector2(dir * _walkSpeed, 0);
     }
 

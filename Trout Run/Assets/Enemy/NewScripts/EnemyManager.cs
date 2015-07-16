@@ -34,6 +34,12 @@ public class EnemyManager : MonoBehaviour
 	}
 
 
+    public void EnemySpawned(EnemyBehaviour enemy)
+    {
+        enemy.ChasePlayer();
+    }
+
+
 
     //! Repopulate the enemy behaviour list with all behaviours of all enemies in the game. Slow so only do at start to determine existing enemies (populate dynamically with in-game created enemies)
     void FindAllEnemyBehavs()
