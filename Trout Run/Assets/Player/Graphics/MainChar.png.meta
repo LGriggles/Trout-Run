@@ -1,6 +1,54 @@
 fileFormatVersion: 2
 guid: 7e02a51d1eb9142459fba520832a26dd
 TextureImporter:
+  fileIDToRecycleName:
+    21300000: MainChar_0
+    21300002: MainChar_1
+    21300004: MainChar_2
+    21300006: MainChar_3
+    21300008: MainChar_4
+    21300010: MainChar_5
+    21300012: MainChar_6
+    21300014: MainChar_7
+    21300016: MainChar_8
+    21300018: MainChar_9
+    21300020: MainChar_10
+    21300022: MainChar_11
+    21300024: MainChar_12
+    21300026: MainChar_13
+    21300028: MainChar_14
+    21300030: MainChar_15
+    21300032: MainChar_16
+    21300034: MainChar_17
+    21300036: MainChar_18
+    21300038: MainChar_19
+    21300040: MainChar_20
+    21300042: MainChar_21
+    21300044: MainChar_22
+    21300046: MainChar_23
+    21300048: MainChar_24
+    21300050: MainChar_25
+    21300052: MainChar_26
+    21300054: MainChar_27
+    21300056: MainChar_28
+    21300058: MainChar_29
+    21300060: MainChar_30
+    21300062: MainChar_31
+    21300064: MainChar_32
+    21300066: MainChar_33
+    21300068: MainChar_34
+    21300070: MainChar_35
+    21300072: MainChar_36
+    21300074: MainChar_37
+    21300076: MainChar_38
+    21300078: MainChar_39
+    21300080: MainChar_40
+    21300082: MainChar_41
+    21300084: MainChar_42
+    21300086: MainChar_43
+    21300088: MainChar_44
+    21300090: MainChar_45
+    21300092: MainChar_46
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -19,6 +67,9 @@ TextureImporter:
   isReadable: 0
   grayScaleToAlpha: 0
   generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
   textureFormat: -2
   maxTextureSize: 2048
@@ -29,6 +80,7 @@ TextureImporter:
     wrapMode: 1
   nPOTScale: 0
   lightmap: 0
+  rGBM: 0
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
@@ -514,3 +566,5 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

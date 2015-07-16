@@ -1,6 +1,31 @@
 fileFormatVersion: 2
 guid: 79bdd39f73ca79b44a8484bbb68c0def
 TextureImporter:
+  fileIDToRecycleName:
+    21300000: WeaponrySheet_0
+    21300002: WeaponrySheet_1
+    21300004: WeaponrySheet_2
+    21300006: WeaponrySheet_3
+    21300008: WeaponrySheet_4
+    21300010: WeaponrySheet_5
+    21300012: WeaponrySheet_6
+    21300014: WeaponrySheet_7
+    21300016: WeaponrySheet_8
+    21300018: WeaponrySheet_9
+    21300020: WeaponrySheet_10
+    21300022: WeaponrySheet_11
+    21300024: WeaponrySheet_12
+    21300026: WeaponrySheet_13
+    21300028: WeaponrySheet_14
+    21300030: WeaponrySheet_15
+    21300032: WeaponrySheet_16
+    21300034: WeaponrySheet_17
+    21300036: WeaponrySheet_18
+    21300038: WeaponrySheet_19
+    21300040: WeaponrySheet_20
+    21300042: WeaponrySheet_21
+    21300044: WeaponrySheet_22
+    21300046: WeaponrySheet_23
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -19,6 +44,9 @@ TextureImporter:
   isReadable: 0
   grayScaleToAlpha: 0
   generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
   textureFormat: -2
   maxTextureSize: 2048
@@ -29,6 +57,7 @@ TextureImporter:
     wrapMode: 1
   nPOTScale: 0
   lightmap: 0
+  rGBM: 0
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
@@ -284,3 +313,5 @@ TextureImporter:
       border: {x: 0, y: 0, z: 0, w: 0}
   spritePackingTag: 
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

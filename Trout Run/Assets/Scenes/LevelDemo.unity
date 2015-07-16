@@ -455,13 +455,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxEnemies: 4
   enemySetups:
-  - enemyPrefab: {fileID: 11400000, guid: fbeeb77a4c8bc7b4295d502dd7261273, type: 2}
+  - enemyPrefab: {fileID: 0}
     startingWeapon: 0
     quantity: 1
-  - enemyPrefab: {fileID: 11400000, guid: fbeeb77a4c8bc7b4295d502dd7261273, type: 2}
+  - enemyPrefab: {fileID: 0}
     startingWeapon: 1
     quantity: 1
-  - enemyPrefab: {fileID: 11400000, guid: fbeeb77a4c8bc7b4295d502dd7261273, type: 2}
+  - enemyPrefab: {fileID: 0}
     startingWeapon: 3
     quantity: 3
   positionsRelative: 1
@@ -840,8 +840,8 @@ Camera:
   near clip plane: .300000012
   far clip plane: 1000
   field of view: 36
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 7
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
@@ -1755,8 +1755,8 @@ Camera:
   near clip plane: .300000012
   far clip plane: 1000
   field of view: 36
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 7
   m_Depth: 2
   m_CullingMask:
     serializedVersion: 2
@@ -1832,8 +1832,8 @@ Camera:
   near clip plane: .300000012
   far clip plane: 1000
   field of view: 36
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1881,7 +1881,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1075607284}
   m_LocalRotation: {x: .0697564706, y: 0, z: 0, w: .997564077}
-  m_LocalPosition: {x: -9.98962498, y: 2.859972, z: -10}
+  m_LocalPosition: {x: -5.13999987, y: 3.20000005, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 925755806}
@@ -1903,9 +1903,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb3b447904e010c458a3c8a54b253759, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 188420386}
-  offset: {x: 0, y: 6, z: -24}
+  offset: {x: 0, y: .649999976, z: -30}
   damping: 8
+  constraints:
+    serializedVersion: 2
+    x: -5.88000011
+    y: 1.22000003
+    width: 19.7199993
+    height: 1.98000002
 --- !u!1 &1110104095
 GameObject:
   m_ObjectHideFlags: 0
@@ -2173,8 +2178,8 @@ Camera:
   near clip plane: .300000012
   far clip plane: 1000
   field of view: 36
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 7
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2

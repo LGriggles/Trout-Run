@@ -8,7 +8,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class Enemy : WeaponHolder
+public class EnemyOld : WeaponHolder
 {
     protected WeaponManager _weaponManager;
     protected TicketManager _ticketManager;
@@ -56,7 +56,7 @@ public class Enemy : WeaponHolder
     public void PickupWeapon(Weapon weapon)
     {
         if(_weapon != null) return; // currently refuse if has weapon, later though we could make him drop current if already has one
-        weapon.Pickup(this);
+        //weapon.Pickup(this);
         weapon.SetDirection(new Vector2(_facingDirection, 0));
     }
     

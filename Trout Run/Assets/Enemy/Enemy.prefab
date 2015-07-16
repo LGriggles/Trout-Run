@@ -8,9 +8,12 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 400000}
-  - 114: {fileID: 11400000}
+  - 114: {fileID: 11475738}
   - 114: {fileID: 11400002}
+  - 114: {fileID: 11469254}
   - 50: {fileID: 5000000}
+  - 60: {fileID: 6050100}
+  - 61: {fileID: 6145714}
   m_Layer: 15
   m_Name: Enemy
   m_TagString: Untagged
@@ -28,7 +31,7 @@ GameObject:
   - 4: {fileID: 400002}
   - 198: {fileID: 19800000}
   - 199: {fileID: 19900000}
-  m_Layer: 15
+  m_Layer: 9
   m_Name: SmallExplosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -67,7 +70,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &100008
 GameObject:
   m_ObjectHideFlags: 0
@@ -83,7 +86,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &100010
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,11 +98,11 @@ GameObject:
   - 61: {fileID: 6100000}
   m_Layer: 15
   m_Name: BodyCollider
-  m_TagString: Shootable
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &100012
 GameObject:
   m_ObjectHideFlags: 0
@@ -110,7 +113,7 @@ GameObject:
   - 4: {fileID: 400012}
   - 119: {fileID: 11900000}
   - 114: {fileID: 11400004}
-  m_Layer: 15
+  m_Layer: 17
   m_Name: Blob Shadow Projector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +127,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.6482258, y: 3.02948308, z: -13.695013}
+  m_LocalPosition: {x: -13.1800003, y: 2.53999996, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400004}
@@ -221,7 +224,7 @@ Rigidbody2D:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
   m_Constraints: 4
 --- !u!60 &6000000
 PolygonCollider2D:
@@ -240,6 +243,25 @@ PolygonCollider2D:
       - {x: .184690475, y: -.59094882}
       - {x: -.182611465, y: -.59094882}
       - {x: -.300647736, y: -.52943635}
+--- !u!60 &6050100
+PolygonCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_Offset: {x: 0, y: 0}
+  m_Points:
+    m_Paths:
+    - - {x: -.178949356, y: .794537067}
+      - {x: .222566605, y: .796015978}
+      - {x: .218275666, y: -.700526476}
+      - {x: .118761539, y: -.811452031}
+      - {x: -.0855739117, y: -.815958261}
+      - {x: -.171375751, y: -.699491501}
 --- !u!61 &6100000
 BoxCollider2D:
   m_ObjectHideFlags: 1
@@ -266,6 +288,19 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
+--- !u!61 &6145714
+BoxCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
 --- !u!95 &9500000
 Animator:
   serializedVersion: 3
@@ -283,21 +318,6 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d1f99f2f6ceb6f4d91ca0a1103450b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  myTeam: 1
-  _graphicsTrans: {fileID: 400004}
-  speed: 24
-  explosion: {fileID: 19800000}
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -309,7 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ba3ec8bf55158343b3eb81da9680e34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drag: 45
+  drag: 28
   gravity: 32
   groundAttraction: 2
   minUngroundingSpeed: 5.5
@@ -324,6 +344,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f69ed5bdc21381419cd4b2592a7e4a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11469254
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cae9244155464c042873dc9cdeff57f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11475738
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db3d692e12f50f44a8b3c65951c84541, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myTeam: 0
+  explosion: {fileID: 19800000}
 --- !u!119 &11900000
 Projector:
   m_ObjectHideFlags: 1

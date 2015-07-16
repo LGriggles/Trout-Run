@@ -89,7 +89,7 @@ public class EnemySpawner : MonoBehaviour
 				
 				// Init enemy
 				_enemies[n].gameObject.SetActive(true);
-				_enemies[n].Init(pos, dir);
+				_enemies[n].Spawn(pos, dir);
 
 				// Add to enemy count
 				_enemyCount += 1;

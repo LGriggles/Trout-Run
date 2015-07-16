@@ -43,13 +43,13 @@ public class Mover : MonoBehaviour
     public float gravity = 32; // use with jump force (dictated by Jump(jumpForce) called from Player etc) to change how jumps feel, the numbers are arbitrary so just change to random values till feels right
     public float groundAttraction = 2; // value determines additional downward force whilst on ground. If the character jitters when going downhill then increase this value
     public float minUngroundingSpeed = 5.5f; // value determnines how fast you must be moving up or down to be "ungrounded". Minor falls being ignored helps with slopes, lifts etc
-    private float _termVel = 23; // terminal velocity (private because 14 feels about right in all cases but feel free to alter)
+    private float _termVel = 14; // terminal velocity (private because 14 feels about right in all cases but feel free to alter)
     Vector2 totalForce;
 
     // THESE VARS ARE THE MOVER'S USE ONLY, NOT FOR TINKERING!
     Rigidbody2D _rigid; // dependancy...
-    Collider2D _feetCollider;
-    Collider2D _bodyCollider;
+    //Collider2D _feetCollider;
+    //Collider2D _bodyCollider;
 
     // For moving / setting flags for FixedUpdate
     Vector2 _standardMovement; // For walking left right and shit
@@ -82,9 +82,17 @@ public class Mover : MonoBehaviour
     private bool _grounded = false;
     public bool onPlatform { get { return _onPlatform; } } // is he on a platform?
     bool _onPlatform = false;
-    bool _collideWithPlatforms = true; // should we collide with platforms or not?
+    //bool _collideWithPlatforms = true; // should we collide with platforms or not?
     bool _fallingThroughPlatform = false; // are we currently falling through a platform due to pressing down and jump?
     bool _continueJump = false;
+
+
+    public bool IsIgnoringPlatforms()
+    {
+        return _fallingThroughPlatform;
+    }
+
+
 
     // Stuff for knockbacks
     List<KnockBack> _knockBacks = new List<KnockBack>();
@@ -121,20 +129,23 @@ public class Mover : MonoBehaviour
     }
 
     // MOVEMENT FUNCTIONS
-    public void Move(Vector2 force) { _standardMovement = force; } // Move character
+    public void Move(Vector2 force) { _standardMovement = force; } // Move character]
+    public void MoveInstant(Vector2 velocity) { _relativeVelocity = velocity; } // Move character
     public void Jump(float jumpForce) { _jump = jumpForce; } // Jump
     public void endExtendedJump() { _continueJump = false; }
     public void DropThroughPlatform()
     {
-        CollideWithPlatforms(false);
+        //CollideWithPlatforms(false);
         _fallingThroughPlatform = true;
     }
 
+    /*
     void CollideWithPlatforms(bool collide)
     {
         LevelController.CollideWithPlatforms(_feetCollider, collide);
         _collideWithPlatforms = collide; // set bool to reflect current state
     }
+     * */
 
     // Reset
     public void Reset()
@@ -142,8 +153,8 @@ public class Mover : MonoBehaviour
         _knockBacks.Clear();
         _relativeVelocity = Vector3.zero;
         _layPlatforms = LayerMask.NameToLayer("Platform");
-        LevelController.CollideWithPlatforms(_bodyCollider, false);
-        LevelController.CollideWithPlatforms(_feetCollider, false);
+        //LevelController.CollideWithPlatforms(_bodyCollider, false);
+        //LevelController.CollideWithPlatforms(_feetCollider, false);
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -156,25 +167,28 @@ public class Mover : MonoBehaviour
     {
         _rigid = GetComponent<Rigidbody2D>();
 
+        /*
         Transform[] children = GetComponentsInChildren<Transform>();
-        foreach (Transform child in children)
+        foreach(Transform child in children)
         {
-            if (child.gameObject.name == "FeetCollider") _feetCollider = child.gameObject.GetComponent<Collider2D>();
-            else if (child.gameObject.name == "BodyCollider") _bodyCollider = child.gameObject.GetComponent<Collider2D>();
+            if(child.gameObject.name == "FeetCollider") _feetCollider = child.gameObject.GetComponent<Collider2D>();
+            else if(child.gameObject.name == "BodyCollider") _bodyCollider = child.gameObject.GetComponent<Collider2D>();
         }
-        if (_feetCollider == null) Debug.LogError(name + " has no child object called 'FeetCollider' with a collider2D in it, it needs it's feet for platforms!");
-        if (_bodyCollider == null) Debug.LogError(name + " has no child object called 'BodyCollider' with a collider2D in it, it needs this for main collisions");
+        if(_feetCollider == null) Debug.LogError(name + " has no child object called 'FeetCollider' with a collider2D in it, it needs it's feet for platforms!");
+        if(_bodyCollider == null) Debug.LogError(name + " has no child object called 'BodyCollider' with a collider2D in it, it needs this for main collisions");
+         * */
 
 
         // Layers - these need to be different if we're an Enemy or Player :/
         //_layFeet = LayerMask.NameToLayer("Feet");
-        _layPlatforms = LayerMask.NameToLayer("Platform");
+        //_layPlatforms = LayerMask.NameToLayer("Platform");
         //_layIgnorePlat = LayerMask.NameToLayer("Ignore Platforms");
     }
 
     void Start()
     {
-        LevelController.CollideWithPlatforms(_bodyCollider, false);
+        //LevelController.CollideWithPlatforms(_bodyCollider, false);
+        Reset();
     }
 
 
@@ -187,7 +201,6 @@ public class Mover : MonoBehaviour
         //MiniProfiler.AddMessage("Grounded = " + _grounded);
         //MiniProfiler.AddMessage("On Platform = " + _onPlatform);
         //MiniProfiler.AddMessage("Collide Plats " + _collideWithPlatforms + "\nFalling Through " + _fallingThroughPlatform);
-
     }
 
 
@@ -199,6 +212,8 @@ public class Mover : MonoBehaviour
         totalForce += _standardMovement; // add the standard movement specified with the public Move() function
         totalForce.y -= gravity; // add the force of gravity
         if (_grounded) _relativeVelocity.y -= groundAttraction; // this is an option
+
+
 
         //Handle knockback
         for (int i = _knockBacks.Count - 1; i >= 0; i--) // reverse iterate so if we remove things it doesn't go mental
@@ -212,23 +227,32 @@ public class Mover : MonoBehaviour
             else _knockBacks[i].Process(); // else process
         }
 
-        // Switch layer so we don't collide with platforms when going up
-        if (velocity.y >= 0 && _collideWithPlatforms)
+
+
+
+        if (_fallingThroughPlatform && velocity.y <= -6)
         {
-            CollideWithPlatforms(false);
-        }// if going up turn off collisions with platforms
+            _fallingThroughPlatform = false;
+        }
+
+        // Switch layer so we don't collide with platforms when going up
+        /*
+        if(velocity.y >= 0 && _collideWithPlatforms) CollideWithPlatforms(false); // if going up turn off collisions with platforms
         else
         {
-            if (_fallingThroughPlatform && velocity.y <= -6)
+            if(_fallingThroughPlatform && velocity.y <= -6)
             {
                 CollideWithPlatforms(true);
                 _fallingThroughPlatform = false;
             }
-            else if (velocity.y < 0 && !_collideWithPlatforms && !_fallingThroughPlatform)
+            else if(velocity.y < 0 && !_collideWithPlatforms && !_fallingThroughPlatform)
             {
                 CollideWithPlatforms(true);
             }
         }
+         * */
+
+
 
         /*
 		if (velocity.y >= 0 || _collideWithPlatforms) // going up
@@ -236,6 +260,11 @@ public class Mover : MonoBehaviour
 		else
 			_feetCollider.layer = _layFeet;
         */
+
+
+
+
+
 
         // THIS IS WHERE WE ADD THE FORCE!!!!! <can u feel da force?>
         _relativeVelocity += totalForce * Time.deltaTime; // add the total force to velocity
@@ -266,7 +295,7 @@ public class Mover : MonoBehaviour
 
 
         // MOVEEEE!
-        _rigid.velocity = velocity;
+        _rigid.MovePosition(_position + (velocity * Time.deltaTime));
 
 
         // COLLISION INFO
