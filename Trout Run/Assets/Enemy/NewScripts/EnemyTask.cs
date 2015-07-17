@@ -235,41 +235,66 @@ public class ETFlyTo : EnemyTask
 
 
 
-//! Always walk towards player
-public class ETChasePlayer : EnemyTask
+//! Charge towards player like a loon with no thought for one's own safety
+public class ETChargeAtPlayer : EnemyTask
 {
-    Transform _playerTrans; 
+    Transform _playerTrans;     //!< The player's transform
+    float _initSqrDist;         //!< Initial squared distance - if player moves and ends up charging totally wrong direction, will reset charge if fursther than this
+    float _sqrOvershoot;        //!< If passes player, how far should it go before turning round and charging again? Squared for performance reasons
+    Vector2 _dir;               //!< Direction of charge
 
-    public ETChasePlayer(Enemy enemy)
+    enum ChargeState { START_CHARGE, CHARGING, OVERSHOT }
+    ChargeState _chargeState;
+
+    public ETChargeAtPlayer(Enemy enemy, float overshoot)
     {
         _myEnemy = enemy;
-        _playerTrans = GameObject.FindGameObjectWithTag("Player").transform;        
+        _playerTrans = GameObject.FindGameObjectWithTag("Player").transform;
+        _sqrOvershoot = overshoot * overshoot;
+        _chargeState = ChargeState.START_CHARGE;
     }
 
 
     public override State DoTask()
     {
-        Vector2 playerPos = _playerTrans.position;
-        float dist = 0;
+        Vector2 enemyToPlayer = (Vector2)(_playerTrans.position) - _myEnemy.Position;
+        float sqrDist = enemyToPlayer.sqrMagnitude;
 
+        switch (_chargeState)
+        {
+            case ChargeState.START_CHARGE:
+                // begin charge
+                _dir = enemyToPlayer.normalized;
+                _initSqrDist = sqrDist;
+                _chargeState = ChargeState.CHARGING;
+
+                break;
+
+            case ChargeState.CHARGING:
+                // check if overshot
+                if (sqrDist < _sqrOvershoot) _chargeState = ChargeState.OVERSHOT;
+                else if (sqrDist > _initSqrDist) _chargeState = ChargeState.START_CHARGE;
+
+                break;
+
+
+            case ChargeState.OVERSHOT:
+                // check dist is greater than overshoot
+                if (sqrDist > _sqrOvershoot) _chargeState = ChargeState.START_CHARGE;
+
+                break;
+        }
+
+
+
+        // Move based on ability
         if(_myEnemy.HasAbilities(EnemyProps.WALKS))
         {
-            float enemyToPlayer = playerPos.x - _myEnemy.Position.x;
-            dist = Mathf.Abs(enemyToPlayer);
-            if(dist > 2)
-            {
-                _myEnemy.Walk(Mathf.Sign(enemyToPlayer));
-            }
-
+            _myEnemy.Walk(Mathf.Sign(_dir.x));
         }
-        else if(_myEnemy.HasAbilities(EnemyProps.FLYS))
+        else if (_myEnemy.HasAbilities(EnemyProps.FLYS))
         {
-            dist = Vector2.SqrMagnitude(playerPos - _myEnemy.Position);
-            if(dist > 4)
-            {
-                Vector2 dir = (playerPos - _myEnemy.Position).normalized;
-                _myEnemy.Fly(dir);
-            }
+            _myEnemy.Fly(_dir);
         }
         else
         {

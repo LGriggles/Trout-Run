@@ -36,7 +36,7 @@ public class EnemyManager : MonoBehaviour
 
     public void EnemySpawned(EnemyBehaviour enemy)
     {
-        enemy.ChasePlayer();
+        enemy.ChargeAtPlayer();
     }
 
 

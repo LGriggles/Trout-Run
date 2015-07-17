@@ -11,41 +11,10 @@ GameObject:
   - 114: {fileID: 11430950}
   - 114: {fileID: 11487522}
   - 50: {fileID: 5087766}
+  - 60: {fileID: 6034752}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &132152
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 473464}
-  - 61: {fileID: 6146052}
-  m_Layer: 14
-  m_Name: BodyCollider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &147682
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 474614}
-  - 60: {fileID: 6081680}
-  m_Layer: 14
-  m_Name: FeetCollider
-  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -138,7 +107,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 481210}
-  m_RootOrder: 4
+  m_RootOrder: 2
 --- !u!4 &436074
 Transform:
   m_ObjectHideFlags: 1
@@ -150,30 +119,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 474690}
-  m_Father: {fileID: 481210}
-  m_RootOrder: 3
---- !u!4 &473464
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 132152}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .0132465474, y: -.145750999, z: 0}
-  m_LocalScale: {x: .75, y: 1.04999995, z: 1}
-  m_Children: []
-  m_Father: {fileID: 481210}
-  m_RootOrder: 2
---- !u!4 &474614
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 147682}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: .0132465474, y: -.551484585, z: 0}
-  m_LocalScale: {x: .600000024, y: 1, z: 1}
-  m_Children: []
   m_Father: {fileID: 481210}
   m_RootOrder: 1
 --- !u!4 &474690
@@ -195,12 +140,10 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 121748}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -16.6508083, y: 4.14067173, z: 0}
+  m_LocalPosition: {x: -16.6508083, y: 9.27999973, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 403492}
-  - {fileID: 474614}
-  - {fileID: 473464}
   - {fileID: 436074}
   - {fileID: 419052}
   m_Father: {fileID: 0}
@@ -221,12 +164,12 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!60 &6081680
+--- !u!60 &6034752
 PolygonCollider2D:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 147682}
+  m_GameObject: {fileID: 121748}
   m_Enabled: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -234,23 +177,12 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Points:
     m_Paths:
-    - - {x: .300922394, y: -.528937578}
-      - {x: .184690475, y: -.59094882}
-      - {x: -.182611465, y: -.59094882}
-      - {x: -.300647736, y: -.52943635}
---- !u!61 &6146052
-BoxCollider2D:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 132152}
-  m_Enabled: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_Offset: {x: 0, y: .0199999996}
-  serializedVersion: 2
-  m_Size: {x: .600000024, y: 1.79999995}
+    - - {x: -.178949356, y: .794537067}
+      - {x: .222566605, y: .796015978}
+      - {x: .22211647, y: -1.10381532}
+      - {x: .122602463, y: -1.20321834}
+      - {x: -.0778923035, y: -1.20388365}
+      - {x: -.175216675, y: -1.10278034}
 --- !u!95 &9538392
 Animator:
   serializedVersion: 3
@@ -291,6 +223,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myTeam: 0
+  _playerIsShooting: 0
   _drillShot: {fileID: 0}
   _levitatedThisJump: 0
   _sprite: {fileID: 121748}

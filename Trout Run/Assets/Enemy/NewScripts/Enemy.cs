@@ -7,7 +7,9 @@ public abstract class Enemy : WeaponHolder
     //public enum State { IDLE = 0, RUN = 1, SHOOT = 2, HIT = 3, DEAD = 4 }; // critical these match animator component, hence exposed values
     //private State _currentState; // DON'T SET DIRECTLY!!! Use ChangeState();
     //public State currentState { get { return _currentState; } }
-
+    public enum EnemyState { OK, HIT, DEAD }
+    private EnemyState _enemyState = EnemyState.OK;
+    public EnemyState CurrentState { get { return _enemyState; } }
 
     protected uint _abilities = 0; //!< Set this to define what things this enemy can do
     protected float _walkSpeed;
@@ -17,11 +19,11 @@ public abstract class Enemy : WeaponHolder
     // To do with moving, probably will be different when merged with Lee's physics
     Vector2 _moveVector;
     protected Transform _transform;
+    protected EnemyAnimation _animation;
 
     // Imported from old enemy
     protected WeaponManager _weaponManager;
     protected TicketManager _ticketManager;
-    protected Animator _anim;
     protected SpriteRenderer _myRenderer;
     private Transform _graphicsTrans;
     private WeaponName _startingWeapon = WeaponName.NONE; // Weapon. The initWeapon is weapon he will spawn with if unarmed at spawn time
@@ -47,7 +49,7 @@ public abstract class Enemy : WeaponHolder
     {
         _transform = this.transform;
         _mover = GetComponent<Mover>();
-        _anim = GetComponentInChildren<Animator>();
+        _animation = new EnemyAnimation(GetComponentInChildren<Animator>());
         _myRenderer = GetComponentInChildren<SpriteRenderer>();
         _graphicsTrans = _myRenderer.transform;
         _weaponManager = GameObject.FindGameObjectWithTag("WeaponManager").GetComponent<WeaponManager>();
@@ -69,31 +71,25 @@ public abstract class Enemy : WeaponHolder
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log (_currentState);
-        //if (_currentState != State.DEAD && _currentState != State.HIT) // No update if dead
-        //{
-            // Set Direction
-            if (Mathf.Sign(_graphicsTrans.localScale.x) != Mathf.Sign(_facingDirection))
-            {
-                _graphicsTrans.localScale = new Vector3(_graphicsTrans.localScale.x * -1, _graphicsTrans.localScale.y, _graphicsTrans.localScale.z);
-            }
+        // Set Direction
+        if (Mathf.Sign(_graphicsTrans.localScale.x) != Mathf.Sign(_facingDirection))
+        {
+            _graphicsTrans.localScale = new Vector3(_graphicsTrans.localScale.x * -1, _graphicsTrans.localScale.y, _graphicsTrans.localScale.z);
+        }
 
 
-            _mover.Move(_moveVector); // move vector controlled by our friend the behaviour
-        //}
-
-
+        _mover.Move(_moveVector); // move vector controlled by our friend the behaviour
         _moveVector = Vector2.zero;
     }
 
 
-
+    
 
 
     // Called whenever enemy is launched from a pool and also on start
     public void Spawn(Vector3 position, float facingDirection)
     {
-        //_currentState = State.IDLE; // Can't ChangeState() from DEAD so we set directly, only time we do this
+        _enemyState = EnemyState.OK;
         visible = true;
         collidable = true;
         _mover.Reset(); // Reset Mover so you ain't moving no more
@@ -172,17 +168,22 @@ public abstract class Enemy : WeaponHolder
 
         // Lose health and then die if none left
         _health -= health;
-        if (_health <= 0) StartCoroutine(Die());
+        if (_health <= 0)
+        {
+            _animation.SetAnim(AnimationHashIDs.Anim.HIT);
+            _enemyState = EnemyState.DEAD;
+            StartCoroutine(Die());
+        }
         else
         {
+            _enemyState = EnemyState.HIT;
             StartCoroutine(HitFlash());
-            StartCoroutine(GetHurt());
         }
     }
 
     IEnumerator HitFlash()
     {
-        SetAnim(Anim.HIT); ;
+        _animation.SetAnim(AnimationHashIDs.Anim.HIT);
         for (int i = 0; i < 5; i++)
         {
             _myRenderer.color = new Color(1.0f, 0.4f, 0.4f, 0.7f);
@@ -190,13 +191,10 @@ public abstract class Enemy : WeaponHolder
             _myRenderer.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
             yield return new WaitForSeconds(0.08f);
         }
-
+        _enemyState = EnemyState.OK;
     }
 
-    protected virtual IEnumerator GetHurt()
-    {
-        yield break;
-    }
+   
 
     public void DropWeapon()
     {
@@ -228,23 +226,7 @@ public abstract class Enemy : WeaponHolder
     }
 
 
-    // Hath been functionated because probably wanna change stuff later
-    enum Anim { IDLE, WALK, HIT }
-    void SetAnim(Anim anim)
-    {
-        switch (anim)
-        {
-            case Anim.IDLE:     _anim.Play("Idle");     return;
-            case Anim.WALK:     _anim.Play("Walk");     return;
-            case Anim.HIT:      _anim.Play("Hit");      return;
-        }
-    }
-
-    // Cunty balls lane
-    void CuntyBallsLane()
-    {
-
-    }
+    
   
 
     //------------------------------------------------//
@@ -252,9 +234,15 @@ public abstract class Enemy : WeaponHolder
     //  All are virtual so children can override and  //
     //  change implementation if they need to.        //
     //------------------------------------------------//
+    public virtual void DoNothing()
+    {
+        _animation.SetAnim(AnimationHashIDs.Anim.IDLE);
+    }
+
+
     public virtual void Walk(float dir)
     {
-        SetAnim(Anim.WALK);
+        _animation.SetAnim(AnimationHashIDs.Anim.WALK);
         _facingDirection = dir;
 
         _moveVector = new Vector2(dir * _walkSpeed, 0);

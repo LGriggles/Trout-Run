@@ -45,13 +45,7 @@ public class Drone : Enemy
         //ChangeState(State.RUN);
     }
 
-    protected override IEnumerator GetHurt()
-    {
-        //ChangeState(State.HIT);
-        yield return new WaitForSeconds(1.0f);
-        //ChangeState(State.RUN);
-        _anim.Play("Walk");
-    }
+    
 
     protected override IEnumerator Die()
     {

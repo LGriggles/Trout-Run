@@ -21,12 +21,35 @@ public class EnemyBehaviour : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if (_myTask == null) return;
-        EnemyTask.State taskState = _myTask.DoTask();
-        if(taskState != EnemyTask.State.ONGOING)
+        switch (_myEnemy.CurrentState)
         {
-            _myTask = null;
+            case Enemy.EnemyState.OK:
+                if (_myTask == null)
+                {
+                    _myEnemy.DoNothing();
+                }
+                else
+                {
+                    EnemyTask.State taskState = _myTask.DoTask();
+                    if (taskState != EnemyTask.State.ONGOING)
+                    {
+                        _myTask = null;
+                    }
+                }
+                
+                break;
+
+            case Enemy.EnemyState.HIT:
+            case Enemy.EnemyState.DEAD:
+                _myTask = null;
+                
+                break;
         }
+
+
+
+        
+        
 
 	
 	}
@@ -59,9 +82,9 @@ public class EnemyBehaviour : MonoBehaviour
 
 
     // Helo moto
-    public bool ChasePlayer()
+    public bool ChargeAtPlayer()
     {
-        _myTask = new ETChasePlayer(_myEnemy);
+        _myTask = new ETChargeAtPlayer(_myEnemy, Random.Range(3, 7));
         return true;
     }
 
