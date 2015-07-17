@@ -16,9 +16,9 @@ Temporary Items
 .apdisk
 
 # Ignore everything but Assets and project settings
-/Trout-Run/*
-!/Trout-Run/Assets
-!/Trout-Run/ProjectSettings
+/Trout Run/*
+!/Trout Run/Assets
+!/Trout Run/ProjectSettings
 
 
 
@@ -38,6 +38,3 @@ Temporary Items
 
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
-
-# Scenes
-*.unity
