@@ -140,7 +140,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 121748}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -16.6508083, y: 9.27999973, z: 0}
+  m_LocalPosition: {x: 2.94000006, y: 9.27999973, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 403492}
@@ -227,8 +227,8 @@ MonoBehaviour:
   _drillShot: {fileID: 0}
   _levitatedThisJump: 0
   _sprite: {fileID: 121748}
-  _normalSpeed: 32
-  _gimpedSpeed: 24
+  _normalSpeed: 200
+  _gimpedSpeed: 180
 --- !u!114 &11487522
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -240,8 +240,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ba3ec8bf55158343b3eb81da9680e34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drag: 45
-  gravity: 32
+  drag: 32
+  gravity: 40
   groundAttraction: 2
   minUngroundingSpeed: 5.5
 --- !u!119 &11970906

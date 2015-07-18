@@ -2,15 +2,86 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]public class EnemySetup
+public class EnemyManager : MonoBehaviour 
 {
-	public Enemy enemyPrefab;
-	public WeaponName startingWeapon = WeaponName.NONE;
-	public int quantity = 1;
-}
+    public Enemy[] enemyPrefabs; // ref to prefabs to instantiate
+    private int[] _numEnemies = new int[(int)Enemy.Type.NUM_ENEMIES]; //!< Each int is number of enemies of each type to pool for this scene
+    private List<GameObject>[] _instances = new List<GameObject>[(int)Enemy.Type.NUM_ENEMIES];
 
-public class EnemySpawner : MonoBehaviour 
-{
+    void Awake()
+    {
+        EnemyDirector[] directors = FindObjectsOfType<EnemyDirector>();
+        foreach (EnemyDirector director in directors)
+        {
+            director.BuildPools();
+
+            for (Enemy.Type i = 0; i < Enemy.Type.NUM_ENEMIES; ++i)
+            {
+                int n = director.MaxPooledEnemies(i);
+                if (n > _numEnemies[(int)i]) _numEnemies[(int)i] = n;
+            }
+        }
+
+        InstantiateEnemies();
+    }
+
+
+
+    void InstantiateEnemies()
+    {
+        for (Enemy.Type i = 0; i < Enemy.Type.NUM_ENEMIES; ++i)
+        {
+            _instances[(int)i] = new List<GameObject>();
+
+            for (int j = 0; j < _numEnemies[(int)i]; ++j)
+            {
+                // Note instantiate to different positions as trying to create loads at same pos can crash it!
+                Vector3 instPos = new Vector3(j, -(int)i, -5); // instantiate in nice orderly queue!
+
+                GameObject enemy = (GameObject)Instantiate(enemyPrefabs[(int)i].gameObject, instPos, Quaternion.Euler(0, 0, 0));
+                enemy.SetActive(false);
+                _instances[(int)i].Add(enemy);
+            }
+        }
+    }
+
+
+    public Enemy SpawnEnemy(Enemy.Type type, WeaponName weapon, Vector2 pos)
+    {
+        for (int i = 0; i < _instances[(int)type].Count; i++)
+        {
+            GameObject go = _instances[(int)type][i];
+            if(go.activeSelf == false)
+            {
+                Enemy returnEnemy = go.GetComponent<Enemy>();
+
+                // Init enemy
+                go.SetActive(true);
+                if ((int)(weapon) < (int)WeaponName.NUMBER_OF_WEAPONS) returnEnemy.startingWeapon = weapon;
+                returnEnemy.Spawn(pos, 1);
+
+
+                // Tell yo boss
+                //EnemyBehaviour behave = _enemies[n].GetComponentInChildren<EnemyBehaviour>();
+                //if (behave == null) Debug.Log("But mom...");
+                //else _enemyManager.EnemySpawned(behave);
+
+                // Return so doesn't bother trawling through other enemies in array
+                return returnEnemy;
+            }
+        }
+
+        return null;
+    }
+
+
+
+
+
+
+
+
+    /*
     EnemyManager _enemyManager;
 
 	public int maxEnemies = 4; // max number at once - number instantiated controlled by each enemy setup's quantity
@@ -149,6 +220,6 @@ public class EnemySpawner : MonoBehaviour
 	}
 
 
-
+    */
 
 }

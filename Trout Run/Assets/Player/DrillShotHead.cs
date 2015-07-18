@@ -116,7 +116,7 @@ public class DrillShotHead : WeaponHolder
                 {
                     Weapon tempWep = weapon;
                     DropWeapon();
-                    tempWep.Pickup(_owner, new Vector2(0, 0));
+                    _owner.PickupWeapon(tempWep);
                 }
                 shootingState = ShootingState.NONE;
                 break;

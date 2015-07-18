@@ -16,6 +16,10 @@ public class Flyer : Enemy
 
     }
 
+    protected override IEnumerator DeathSequence()
+    {
+        yield break;
+    }
 	
 
    

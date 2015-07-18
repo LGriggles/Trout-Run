@@ -47,9 +47,17 @@ public abstract class ProjectileWeapon : Weapon
 
 	public override void SetDirection(Vector2 direction)
 	{
-        MiniProfiler.AddMessage("wepdir3" + direction);
+        //MiniProfiler.AddMessage("wepdir3" + direction);
         _desiredDirection = direction;
-        _mySprite.transform.localScale = new Vector3 (1, _owner.facingDirection, 1);
+        _mySprite.transform.localScale = new Vector3(1, _owner.facingDirection, 1);
+        /*
+        if (_owner != null) _mySprite.transform.localScale = new Vector3(1, _owner.facingDirection, 1);
+        else
+        {
+            _mySprite.transform.localScale = new Vector3(1, Mathf.Sign(direction.x), 1);
+            return;
+        }
+         * */
 
 		switch(base.possibleDirections)
 		{
@@ -74,7 +82,7 @@ public abstract class ProjectileWeapon : Weapon
 		}
         
         _weaponDirection = Vector2.Lerp(_weaponDirection, _desiredDirection, 0.3f);
-        MiniProfiler.AddMessage("wepdir2" + _weaponDirection);
+        //MiniProfiler.AddMessage("wepdir2" + _weaponDirection);
 		transform.localPosition = new Vector2 (_owner.facingDirection / 3, 0.0f);
 		float thatsRad = Mathf.Atan2(_weaponDirection.y, _weaponDirection.x);
 		float ang = thatsRad * Mathf.Rad2Deg;

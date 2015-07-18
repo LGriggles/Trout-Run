@@ -54,8 +54,4 @@ public class WeaponManagerEditor : Editor
 			EditorUtility.SetDirty (target);
 		}
 	}
-
-
-
-
 }

@@ -54,7 +54,7 @@ public class EnemyAnimation
 
 public static class AnimationHashIDs
 {
-    public enum Anim { IDLE, WALK, HIT, SHOOT, NUM_ANIMS }
+    public enum Anim { IDLE, WALK, HIT, DIE, SHOOT, NUM_ANIMS }
 
 
     private static int[] _ids = new int[(int)Anim.NUM_ANIMS];
@@ -77,6 +77,7 @@ public static class AnimationHashIDs
         _ids[(int)Anim.IDLE]     = Animator.StringToHash("Idle");
         _ids[(int)Anim.WALK]     = Animator.StringToHash("Walk");
         _ids[(int)Anim.HIT]      = Animator.StringToHash("Hit");
+        _ids[(int)Anim.DIE]      = Animator.StringToHash("Die");
         _ids[(int)Anim.SHOOT]    = Animator.StringToHash("Shoot");
     }
 

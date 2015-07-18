@@ -3,6 +3,15 @@ using System.Collections;
 
 public abstract class Weapon : MonoBehaviour
 {
+    public void DebugPrint()
+    {
+        Debug.Log("Mein owner is " +_owner.gameObject.name);
+
+    }
+
+
+
+
     WeaponManager _weaponManager;
 
     protected int _strength; // damage weapon will do

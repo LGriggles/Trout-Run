@@ -3,10 +3,9 @@ using System.Collections;
 
 public abstract class Enemy : WeaponHolder 
 {
+    public enum Type { DRONE, FLYER, NUM_ENEMIES }
+
     // State
-    //public enum State { IDLE = 0, RUN = 1, SHOOT = 2, HIT = 3, DEAD = 4 }; // critical these match animator component, hence exposed values
-    //private State _currentState; // DON'T SET DIRECTLY!!! Use ChangeState();
-    //public State currentState { get { return _currentState; } }
     public enum EnemyState { OK, HIT, DEAD }
     private EnemyState _enemyState = EnemyState.OK;
     public EnemyState CurrentState { get { return _enemyState; } }
@@ -22,6 +21,7 @@ public abstract class Enemy : WeaponHolder
     protected EnemyAnimation _animation;
 
     // Imported from old enemy
+    protected EnemyDirector _enemyDirector;
     protected WeaponManager _weaponManager;
     protected TicketManager _ticketManager;
     protected SpriteRenderer _myRenderer;
@@ -30,6 +30,7 @@ public abstract class Enemy : WeaponHolder
 
     protected int _maxHealth = 10;
     protected int _health;
+    protected float _ticketAmount = 0; //For best results, stick to even numbers
 
     
     // Getters / Setters
@@ -39,6 +40,7 @@ public abstract class Enemy : WeaponHolder
     public WeaponName startingWeapon { set { _startingWeapon = value; } }
     public bool visible { get { return _myRenderer.gameObject.activeSelf; } set { _myRenderer.gameObject.SetActive(value); } }
     public bool collidable { get { return GetComponent<Rigidbody2D>().simulated; } set { GetComponent<Rigidbody2D>().simulated = value; } }
+    public void SetDirector(EnemyDirector director) { _enemyDirector = director; }
     
     
     protected abstract void Initialize(); //!< Override to define enemy specific functions that would normally be in Awake
@@ -59,14 +61,7 @@ public abstract class Enemy : WeaponHolder
         Initialize();
     }
 
-    // Given a weapon prefab will instantiate a new instance of it and pick it up
-    public void PickupWeapon(Weapon weapon)
-    {
-        if (_weapon != null) return; // currently refuse if has weapon, later though we could make him drop current if already has one
-        weapon.Pickup(this);
-        weapon.SetDirection(new Vector2(_facingDirection, 0));
-    }
-
+    
 
     // Update is called once per frame
     void Update()
@@ -76,14 +71,12 @@ public abstract class Enemy : WeaponHolder
         {
             _graphicsTrans.localScale = new Vector3(_graphicsTrans.localScale.x * -1, _graphicsTrans.localScale.y, _graphicsTrans.localScale.z);
         }
+        if (_weapon != null) _weapon.SetDirection(new Vector2(_facingDirection, 0));
 
 
         _mover.Move(_moveVector); // move vector controlled by our friend the behaviour
         _moveVector = Vector2.zero;
     }
-
-
-    
 
 
     // Called whenever enemy is launched from a pool and also on start
@@ -94,13 +87,11 @@ public abstract class Enemy : WeaponHolder
         collidable = true;
         _mover.Reset(); // Reset Mover so you ain't moving no more
 
-
-        if (facingDirection < 0) facingDirection = -1; // Ensure facingDirection is either 1 or -1
-        else facingDirection = 1;
-
         _transform.position = position;
-        _facingDirection = facingDirection;
+        _facingDirection = Mathf.Sign(facingDirection);
         _health = _maxHealth;
+        
+
 
         // Create init weapon if unarmed.
         // Note that it might be better to have a "weapon pool" later rather than instantating new weapon
@@ -114,6 +105,18 @@ public abstract class Enemy : WeaponHolder
         //For children
         Spawn();
     }
+
+
+    
+
+    public void DropWeapon()
+    {
+        if (_weapon == null) return;
+        _weapon.Throw(Vector2.up * 12, true);
+        _weapon = null;
+    }
+
+   
 
 
     private IEnumerator Shoot()
@@ -130,37 +133,7 @@ public abstract class Enemy : WeaponHolder
         //}
     }
 
-
-    // Always use instead of setting state directly
-    /*
-    public void ChangeState(State newState)
-    {
-        if (_currentState == State.DEAD) return; // can't change state if dying
-        _currentState = newState;
-
-        // Can't shoot if he ain't got no weapon!
-        if (_currentState == State.SHOOT && _weapon == null) _currentState = State.IDLE;
-
-        //_anim.SetInteger("state", (int)_currentState);
-
-        switch (_currentState)
-        {
-            case State.SHOOT:
-                StartCoroutine(Shoot());
-                break;
-            case State.IDLE:
-                _anim.Play("Idle");
-                break;
-            case State.HIT:
-                _anim.Play("Hit");
-                break;
-            case State.RUN:
-                _anim.Play("Walk");
-                break;
-        }
-    }
-     * */
-
+    // Get hit
     public void LoseHealth(int health)
     {
         // Only want to die once!!
@@ -170,19 +143,18 @@ public abstract class Enemy : WeaponHolder
         _health -= health;
         if (_health <= 0)
         {
-            _animation.SetAnim(AnimationHashIDs.Anim.HIT);
-            _enemyState = EnemyState.DEAD;
             StartCoroutine(Die());
         }
         else
         {
-            _enemyState = EnemyState.HIT;
             StartCoroutine(HitFlash());
         }
     }
 
+    // Get Hit - routine
     IEnumerator HitFlash()
     {
+        _enemyState = EnemyState.HIT;
         _animation.SetAnim(AnimationHashIDs.Anim.HIT);
         for (int i = 0; i < 5; i++)
         {
@@ -194,30 +166,41 @@ public abstract class Enemy : WeaponHolder
         _enemyState = EnemyState.OK;
     }
 
-   
 
-    public void DropWeapon()
-    {
-        if (_weapon == null) return;
-        _weapon.Throw(Vector2.up * 12, true);
-        _weapon = null;
-    }
 
-    // Override with unique death sequence! MAKE SURE SET AS DEAD AFTER!!
-    protected virtual IEnumerator Die()
+    // Die!
+    private IEnumerator Die()
     {
-        SetAsDead();
+        // Set state and drop your trousers I mean weapon
+        _enemyState = EnemyState.DEAD;
+        _animation.SetAnim(AnimationHashIDs.Anim.DIE);
+        DropWeapon();
+
+        // Sort them lovely tickets out blud
+        float kingOfDreamland = 0;
+        for (int i = 0; i < _ticketAmount; i++)
+        {
+            GameObject johnBervage = _ticketManager.SpawnTicket(new Vector2(transform.position.x, transform.position.y));
+            if (johnBervage != null)
+            {
+                //johnBervage.GetComponent<Rigidbody2D>().AddForce(new Vector2 (-((ticketAmount/2) * 100) + (i * 100)+50, Mathf.Abs(-((ticketAmount/2) * 75) + (i * 100)+50)));
+                johnBervage.GetComponent<Rigidbody2D>().AddForce(new Vector2(Mathf.Cos(kingOfDreamland), Mathf.Sin(kingOfDreamland)) * 400);
+                kingOfDreamland += (360 / _ticketAmount) * Mathf.Deg2Rad;
+            }
+        }
+
+        // Start die animation, handled in children
+        yield return StartCoroutine(DeathSequence());
+
+        // Clear up
+        if (_weapon != null) _weapon.Reset();
+        //if (_enemyDirector != null) _enemyDirector.EnemyDied();
+        gameObject.SetActive(false);
+        
         yield break;
     }
 
-    // This needs to be called at the end of die
-    protected void SetAsDead()
-    {
-        if (_weapon != null) _weapon.Reset();
-        EnemySpawner spawner = GetComponentInParent<EnemySpawner>();
-        if (spawner != null) spawner.EnemyDied();
-        gameObject.SetActive(false);
-    }
+    protected abstract IEnumerator DeathSequence();
 
 
     public bool HasAbilities(uint abilities)

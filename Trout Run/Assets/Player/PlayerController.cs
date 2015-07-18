@@ -21,7 +21,8 @@ public class PlayerController : WeaponHolder
         GROUNDLOCK
     }
     PlayerStates _playerState;
-    public Weapon _drillShot;
+    public Weapon _drillShot; 
+
     //Levitation
     public bool _levitatedThisJump;
     struct DodgingStruct
@@ -56,7 +57,7 @@ public class PlayerController : WeaponHolder
     private float _tempDrag, _tempGrav, _tempGrdAtt, _tempUngrdSpeed;
 
     bool _hasDoubleJump = false;
-    float _jumpForce = 8f;
+    float _jumpForce = 6.5f;
     public float JumpForce
     {
         get { return _jumpForce; }
@@ -77,6 +78,7 @@ public class PlayerController : WeaponHolder
 
     void Awake()
     {
+        _weaponOffset = new Vector2(0.3f, 0.1f);
         DontDestroyOnLoad(transform.gameObject);
         _arm = GameObject.Find("Arm");
         _anim = GetComponentInChildren<Animator>();
@@ -197,7 +199,7 @@ public class PlayerController : WeaponHolder
 
         if (Input.GetButtonDown("Pickup") && !_pickup)
         {
-            if (_weapon == null) StartCoroutine(PickupWeapon());
+            if (_weapon == null) StartCoroutine(PickupNextFrame());
             else DropWeapon();
         }
 
@@ -321,7 +323,7 @@ public class PlayerController : WeaponHolder
         UpdateAllowShooting();
         if (Input.GetButtonDown("Pickup") && !_pickup)
         {
-            if (_weapon == null) StartCoroutine(PickupWeapon());
+            if (_weapon == null) StartCoroutine(PickupNextFrame());
             else DropWeapon();
         }
 
@@ -377,7 +379,7 @@ public class PlayerController : WeaponHolder
     {
         UpdateAllowShooting();
 
-        if (_weapon == null) StartCoroutine(PickupWeapon());
+        if (_weapon == null) StartCoroutine(PickupNextFrame());
 
         //Hit the land, you gotta wait to move again bruh
         if (_mover.isGrounded)
@@ -521,7 +523,7 @@ public class PlayerController : WeaponHolder
         _dodging._inputPeriod = false;
     }
 
-    private IEnumerator PickupWeapon()
+    private IEnumerator PickupNextFrame()
     {
         _pickup = true;
         yield return new WaitForFixedUpdate();
@@ -560,14 +562,15 @@ public class PlayerController : WeaponHolder
                 Weapon weaponPickup = other.GetComponentInParent<Weapon>();
                 if (weaponPickup != null && _weapon == null)
                 {
-                    weapon = weaponPickup;
-                    weaponPickup.Pickup(this, new Vector2(0.3f, 0.1f));
-                    weaponPickup.SetDirection(new Vector2(_facingDirection, 0));
+                    PickupWeapon(weaponPickup);
                 }
-                StartCoroutine(PickupWeapon());
+                StartCoroutine(PickupNextFrame());
             }
         }
     }
+
+
+
 
     void OnTriggerEnter2D(Collider2D other)
     {
