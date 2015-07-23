@@ -26,6 +26,9 @@ public class EnemyManager : MonoBehaviour
     }
 
 
+    
+
+
 
     void InstantiateEnemies()
     {
@@ -57,8 +60,8 @@ public class EnemyManager : MonoBehaviour
 
                 // Init enemy
                 go.SetActive(true);
-                if ((int)(weapon) < (int)WeaponName.NUMBER_OF_WEAPONS) returnEnemy.startingWeapon = weapon;
-                returnEnemy.Spawn(pos, 1);
+                if ((int)(weapon) != (int)WeaponName.NUMBER_OF_WEAPONS) returnEnemy.startingWeapon = weapon;
+                returnEnemy.Spawn(pos);
 
 
                 // Tell yo boss

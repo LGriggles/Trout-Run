@@ -86,7 +86,7 @@ public class PlayerController : WeaponHolder
         _layPickup = LayerMask.NameToLayer("IgnoreAllButPlayer");
         _layEnemy = LayerMask.NameToLayer("Enemy");
         myTeam = Team.PLAYER;
-        _myRenderer = _sprite.GetComponent<SpriteRenderer>();
+        _myRenderer = _sprite.GetComponentInChildren<SpriteRenderer>();
         //Set up dodging
         _dodging._curDodgeTime = 0;
         _dodging._executedDodge = false;

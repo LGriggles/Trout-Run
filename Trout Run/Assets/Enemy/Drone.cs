@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Drone : Enemy
 {
+    public override Type EnemyType { get { return Type.DRONE; } }
+
     // Death and shooting
     public ParticleSystem explosion;
 

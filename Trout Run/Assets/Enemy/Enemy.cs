@@ -4,6 +4,7 @@ using System.Collections;
 public abstract class Enemy : WeaponHolder 
 {
     public enum Type { DRONE, FLYER, NUM_ENEMIES }
+    public abstract Type EnemyType { get; }
 
     // State
     public enum EnemyState { OK, HIT, DEAD }
@@ -21,7 +22,7 @@ public abstract class Enemy : WeaponHolder
     protected EnemyAnimation _animation;
 
     // Imported from old enemy
-    protected EnemyDirector _enemyDirector;
+    protected EnemySpawner _enemySpawner;
     protected WeaponManager _weaponManager;
     protected TicketManager _ticketManager;
     protected SpriteRenderer _myRenderer;
@@ -37,10 +38,11 @@ public abstract class Enemy : WeaponHolder
     public uint Abilities { get { return _abilities; } }
     public Vector2 Position { get { return _transform.position; } set { _transform.position = value; } }
     public bool OnGround { get { return _mover.isGrounded; } }
-    public WeaponName startingWeapon { set { _startingWeapon = value; } }
+    public WeaponName startingWeapon { set { _startingWeapon = value; } get { return _startingWeapon; } }
     public bool visible { get { return _myRenderer.gameObject.activeSelf; } set { _myRenderer.gameObject.SetActive(value); } }
     public bool collidable { get { return GetComponent<Rigidbody2D>().simulated; } set { GetComponent<Rigidbody2D>().simulated = value; } }
-    public void SetDirector(EnemyDirector director) { _enemyDirector = director; }
+    public void SetSpawner(EnemySpawner spawner) { _enemySpawner = spawner; }
+    
     
     
     protected abstract void Initialize(); //!< Override to define enemy specific functions that would normally be in Awake
@@ -80,15 +82,15 @@ public abstract class Enemy : WeaponHolder
 
 
     // Called whenever enemy is launched from a pool and also on start
-    public void Spawn(Vector3 position, float facingDirection)
+    public void Spawn(Vector3 position)
     {
-        _enemyState = EnemyState.OK;
+        _enemyState = EnemyState.OK;        
         visible = true;
         collidable = true;
         _mover.Reset(); // Reset Mover so you ain't moving no more
 
         _transform.position = position;
-        _facingDirection = Mathf.Sign(facingDirection);
+        //_facingDirection = Mathf.Sign(facingDirection);
         _health = _maxHealth;
         
 
@@ -194,7 +196,7 @@ public abstract class Enemy : WeaponHolder
 
         // Clear up
         if (_weapon != null) _weapon.Reset();
-        //if (_enemyDirector != null) _enemyDirector.EnemyDied();
+        if (_enemySpawner != null) _enemySpawner.EnemyDied(this);
         gameObject.SetActive(false);
         
         yield break;

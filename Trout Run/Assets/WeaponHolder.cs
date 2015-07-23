@@ -23,7 +23,7 @@ public class WeaponHolder : MonoBehaviour
     {
         if (_weapon != null) return; // currently refuse if has weapon, later though we could make him drop current if already has one
         weapon.Pickup(this, _weaponOffset);
-        weapon.DebugPrint();
+        //weapon.DebugPrint();
         weapon.SetDirection(new Vector2(_facingDirection, 0));
     }
 
