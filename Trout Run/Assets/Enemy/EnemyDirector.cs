@@ -52,14 +52,13 @@ public class EnemyDirector : MonoBehaviour
         {
             _enemyBehavs[i].MoveToPosition(new Vector2(9.3f, 7.1f));
         }
-	
 	}
+	
 
     // Update is called once per frame
     void Update() 
     {
         _spawnTimer += Time.deltaTime;
-
         if (_spawnTimer > 0.5f && _spawner.CanSpawn)
         {
             Enemy theNewGuy = _spawner.Spawn(new Vector2(5, 12));

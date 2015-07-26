@@ -5,59 +5,35 @@ using System.Collections;
 // Base class for all weapons that require particle system bullets or other projectiles
 public abstract class ProjectileWeapon : Weapon 
 {
+    public Bullets _bulletSystem;
+    public float BulletSpeed;
     Vector2 _desiredDirection = new Vector2();
     private SpriteRenderer _mySprite;
-	public int bulletCount { get { return _bullets.bulletCount; } }
-	protected Bullets _bullets // the particle system for bullets
-	{ get
-		{
-            if(_owner == null)
-                return null;
-			switch(_owner.myTeam)
-			{
-                case WeaponHolder.Team.PLAYER: return _playerBulletParticles;
-                case WeaponHolder.Team.ENEMY: return _enemyBulletsParticles;
-			default: return null;
-			}
-		}
-	}
-	protected Bullets _playerBulletParticles;
-	protected Bullets _enemyBulletsParticles;
 
+    //Bullet
+    public GameObject prefabBase;
 
 	protected override void Awake()
 	{
         _mySprite = GetComponentInChildren<SpriteRenderer>();
 		Transform[] children = GetComponentsInChildren<Transform>();
-		foreach(Transform child in children)
-		{
-			if(child.gameObject.name == "PlayerBullets") _playerBulletParticles = child.GetComponent<Bullets>();
-			else if(child.gameObject.name == "EnemyBullets") _enemyBulletsParticles = child.GetComponent<Bullets>();
-		}
-		if(_playerBulletParticles == null) Debug.LogError (name + " needs a player bullet particle system in a child object called 'PlayerBullets'");
-		if(_playerBulletParticles == null) Debug.LogError (name + " needs an enemy bullet particle system in a child object called 'EnemyBullets'");
-
+        _bulletSystem = this.gameObject.AddComponent<Bullets>();
+        if (prefabBase != null && _bulletSystem != null)
+        {
+            _bulletSystem.InstantiatePool(200, prefabBase);
+        }
 		base.Awake ();
 	}
 
-    public override void Step()
+    void Start()
     {
-        //_weaponDirection = Vector2.Lerp(_weaponDirection, _desiredDirection, 0.3f);
+
     }
 
 	public override void SetDirection(Vector2 direction)
 	{
-        //MiniProfiler.AddMessage("wepdir3" + direction);
         _desiredDirection = direction;
         _mySprite.transform.localScale = new Vector3(1, _owner.facingDirection, 1);
-        /*
-        if (_owner != null) _mySprite.transform.localScale = new Vector3(1, _owner.facingDirection, 1);
-        else
-        {
-            _mySprite.transform.localScale = new Vector3(1, Mathf.Sign(direction.x), 1);
-            return;
-        }
-         * */
 
 		switch(base.possibleDirections)
 		{
@@ -82,7 +58,6 @@ public abstract class ProjectileWeapon : Weapon
 		}
         
         _weaponDirection = Vector2.Lerp(_weaponDirection, _desiredDirection, 0.3f);
-        //MiniProfiler.AddMessage("wepdir2" + _weaponDirection);
 		transform.localPosition = new Vector2 (_owner.facingDirection / 3, 0.0f);
 		float thatsRad = Mathf.Atan2(_weaponDirection.y, _weaponDirection.x);
 		float ang = thatsRad * Mathf.Rad2Deg;
@@ -90,12 +65,6 @@ public abstract class ProjectileWeapon : Weapon
 		transform.rotation = Quaternion.Euler(0, 0, ang);
 		transform.localPosition += transform.right * _offset.x;
 		transform.localPosition += Vector3.up * _offset.y;
-	}
-
-	public override void Reset ()
-	{
-		_playerBulletParticles.Reset();
-		_enemyBulletsParticles.Reset();
 	}
 
 }

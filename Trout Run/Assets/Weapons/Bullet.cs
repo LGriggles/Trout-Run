@@ -12,6 +12,7 @@ public class Bullet : MonoBehaviour
     int _enemyLayer = LayerMask.NameToLayer("Enemy");
     int _playerLayer = LayerMask.NameToLayer("Player");
     int _sceneryLayer = LayerMask.NameToLayer("SolidScenery");
+    int _targetLayer;
 
     // Use this for initialization
     void Start()
@@ -24,20 +25,17 @@ public class Bullet : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
     }
 
-    public void  Shot(Bullets bulletsManager, Vector2 velocity, WeaponHolder owner)
+    public void Shot(Bullets bulletsManager, Vector2 velocity, WeaponHolder owner)
     {
         _owner = owner;
         _firedFrom = _owner.weapon;
         switch (owner.myTeam)
         {
             case WeaponHolder.Team.PLAYER:
-                //_targetMask = 1 << LayerMask.NameToLayer("Enemy");
-                //print(_targetMask);
-                //gameObject.layer = _targetMask;
+                _targetLayer = 1 << LayerMask.NameToLayer("Enemy");
                 break;
             case WeaponHolder.Team.ENEMY:
-                ////_targetMask = 1 << LayerMask.NameToLayer("Player");
-                //gameObject.layer = _targetMask;
+                _targetLayer = 1 << LayerMask.NameToLayer("Player");
                 break;
         }
 
@@ -46,37 +44,47 @@ public class Bullet : MonoBehaviour
         _rigidBody.velocity = velocity;
     }
 
-    // Update is called once per frame
-    void Update()
+    void DestroyMe()
     {
+        ownerFiringSystem.DestroyObject(gameObject);
     }
 
     void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.gameObject.layer == _enemyLayer)
+        if (collider.gameObject.layer == _targetLayer)
         {
-            if (_owner.myTeam == WeaponHolder.Team.ENEMY)
-                return;
-            Enemy enemy = collider.GetComponentInParent<Enemy>();
-            if (enemy != null)
+            //Target layer hita
+        }
+        if (collider.gameObject.layer == _enemyLayer)           //Colliding with an enemy
+        {
+            if (_owner.myTeam == WeaponHolder.Team.PLAYER)
             {
-                _firedFrom.ApplyKnockback(enemy.mover, _rigidBody.velocity);
-                enemy.LoseHealth(_firedFrom.strength);
-                ownerFiringSystem.DestroyObject(gameObject);
+                if (_owner.myTeam == WeaponHolder.Team.ENEMY)
+                    return;
+                Enemy enemy = collider.GetComponentInParent<Enemy>();
+                if (enemy != null)
+                {
+                    _firedFrom.ApplyKnockback(enemy.mover, _rigidBody.velocity);
+                    enemy.LoseHealth(_firedFrom.strength);
+                    DestroyMe();
+                }
             }
         }
-        else if (collider.gameObject.layer == _sceneryLayer)
+        else if (collider.gameObject.layer == _sceneryLayer)    //Colliding with scenery
         {
-            ownerFiringSystem.DestroyObject(gameObject);
+            DestroyMe();
         }
-        else if (collider.gameObject.layer == _playerLayer)
+        else if (collider.gameObject.layer == _playerLayer)     //Colliding with teh player
         {
-            PlayerController player = collider.GetComponentInParent<PlayerController>();
-            if (player != null)
+            if (_owner.myTeam == WeaponHolder.Team.ENEMY)
             {
-                _firedFrom.ApplyKnockback(player.mover, _rigidBody.velocity);
-                player.GetHit();
-                ownerFiringSystem.DestroyObject(gameObject);
+                PlayerController player = collider.GetComponentInParent<PlayerController>();
+                if (player != null)
+                {
+                    _firedFrom.ApplyKnockback(player.mover, _rigidBody.velocity);
+                    player.GetHit();
+                    DestroyMe();
+                }
             }
         }
     }

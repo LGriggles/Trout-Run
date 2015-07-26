@@ -9,7 +9,6 @@ public class EnemyBullets : MonoBehaviour
 	private Material material;
 	private float flashSpeed = 1600;
 
-
 	// Use this for initialization
 	void Awake () 
 	{
@@ -22,7 +21,6 @@ public class EnemyBullets : MonoBehaviour
 	{
 		Flash ();
 	}
-
 
 	public void ShootBullet(Vector2 position, Vector2 velocity)
 	{

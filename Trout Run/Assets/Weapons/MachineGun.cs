@@ -8,7 +8,6 @@ public class MachineGun : ProjectileWeapon
 	private bool _shooting = false;
 	private Mover _mover; // mover of whoever is holding this gun
 
-    public GameObject prefabBase;
 
     public override WeaponName GetName() { return WeaponName.MACHINE_GUN;} // get name as enum (can do .ToString() to get as a string if needed)
 	protected override void OnAwake(){}
@@ -20,14 +19,7 @@ public class MachineGun : ProjectileWeapon
         _maxDurability = 160;
         ResetDurability();
 		_directions = WeaponDir.EIGHT;
-
-
-        _playerBulletParticles.InstantiatePool(200, prefabBase);
-        _enemyBulletsParticles.InstantiatePool(200, prefabBase);
-
 		// Deactivate bullets till weapon picked up
-		//_playerBulletParticles.gameObject.SetActive(false);
-		//_enemyBulletsParticles.gameObject.SetActive(false);
 	}
 
 	public override void ApplyKnockback (Mover mover, Vector2 impactDirection)
@@ -40,19 +32,6 @@ public class MachineGun : ProjectileWeapon
 	protected override void OnPickup()
 	{
 		_mover = GetComponentInParent<Mover>();
-
-        if(_owner.myTeam == WeaponHolder.Team.PLAYER)
-		{
-			_playerBulletParticles.gameObject.SetActive(true);
-			_enemyBulletsParticles.gameObject.SetActive(false);
-		}
-        else if(_owner.myTeam == WeaponHolder.Team.ENEMY)
-		{
-			_playerBulletParticles.gameObject.SetActive(false);
-			_enemyBulletsParticles.gameObject.SetActive(true);
-		}
-
-		_bullets.Reset ();
 	}
 
 	// Virtual function in base class to interface with all weapons (via override)
@@ -98,24 +77,24 @@ public class MachineGun : ProjectileWeapon
 		// Sometimes the enemy is still firing when dies (in coroutine) so bullets in null
 		// Perhaps this indicates that the logic of "how long to fire for" should be in the enemy?
 		// But this means he'd need separate logic for all different types of weapons
-		if(_bullets == null) return;
+        if (_bulletSystem == null) return;
 
 		Vector3 pos;
 		Vector3 velo;
 
 		// Position
-		pos = _bullets.transform.position;
+        pos = _bulletSystem.transform.position;
 		pos += new Vector3(0, Random.Range(-0.1f, 0.1f), 0); // randominate the starting pos slightly
 		
 		// Velocity
-		velo = transform.right * (_bullets.startSpeed);
+        velo = transform.right * (BulletSpeed);
 
 		// Inherit x axis velocity if more than velocity on it's own (reduce weird effect where when you move bullets seem more spaced out)
 		if(Mathf.Abs (velo.x + _mover.velocity.x) > Mathf.Abs (velo.x))
 			velo.x += _mover.velocity.x;
 
 		// Acually emit the particle
-        _bullets.Shoot( pos, velo * 2, _owner);
+        _bulletSystem.Shoot(pos, velo, _owner);
 		//_bullets.Emit(pos, velo, _owner);
         LoseDurability(1);
 	}
