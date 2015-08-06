@@ -5,6 +5,8 @@ using System.Collections;
 // Base class for all weapons that require particle system bullets or other projectiles
 public abstract class ProjectileWeapon : Weapon 
 {
+    public override Type WeaponType { get { return Type.PROJECTILE; } }
+
     public Bullets _bulletSystem;
     public float BulletSpeed;
     Vector2 _desiredDirection = new Vector2();

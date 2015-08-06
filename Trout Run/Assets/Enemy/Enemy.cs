@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 public abstract class Enemy : WeaponHolder 
@@ -32,6 +33,11 @@ public abstract class Enemy : WeaponHolder
     protected int _maxHealth = 10;
     protected int _health;
     protected float _ticketAmount = 0; //For best results, stick to even numbers
+
+    // Behaviour Stuff
+    EnemyTask _myTask;
+    EnemyTask.State _myTaskState = EnemyTask.State.NULL;
+    public event TaskStateChangeEventHandler TaskStateChanged;
 
     
     // Getters / Setters
@@ -78,6 +84,62 @@ public abstract class Enemy : WeaponHolder
 
         _mover.Move(_moveVector); // move vector controlled by our friend the behaviour
         _moveVector = Vector2.zero;
+
+        // Update Task
+        EnemyTask.State taskState = UpdateTask();
+        if (taskState != _myTaskState)
+        {
+            _myTaskState = taskState;
+            TaskStateChangedEventArgs args = new TaskStateChangedEventArgs();
+            args.NewState = _myTaskState;
+            args.Task = _myTask;
+            if (TaskStateChanged != null) TaskStateChanged(this, args);
+        }
+    }
+
+
+    // Give this enemy a task - the master will receive updates and should manage the enemy's behaviour
+    public void GiveTask(EnemyTask task, IEnemyTaskGiver master)
+    {
+        if (TaskStateChanged != null)
+        {
+            TaskStateChangedEventArgs args = new TaskStateChangedEventArgs();
+            args.NewState = EnemyTask.State.TASK_CHANGING;
+            args.Task = _myTask;
+            TaskStateChanged(this, args);
+        }
+        _myTask = task;
+        _myTask.Reset(this);
+        TaskStateChanged = master.EventHandler;
+    }
+
+
+    
+
+
+    // Update the enemy task
+    EnemyTask.State UpdateTask()
+    {
+        if (_myTask == null)
+        {
+            DoNothing();
+            return EnemyTask.State.COMPLETE;
+        }
+
+
+        switch (CurrentState)
+        {
+            case Enemy.EnemyState.OK:
+                return _myTask.DoTask();
+
+            case Enemy.EnemyState.HIT:
+                return EnemyTask.State.FAILED; // this is because may have been knocked off course and need to recalculate paths etc
+
+            case Enemy.EnemyState.DEAD:
+                return EnemyTask.State.ENEMY_DEAD;
+        }
+
+        return EnemyTask.State.ONGOING;
     }
 
 

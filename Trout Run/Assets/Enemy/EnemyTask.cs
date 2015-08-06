@@ -1,20 +1,46 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 //! Base class for all enemy tasks
 public abstract class EnemyTask
 {
-    public enum State { ONGOING, COMPLETE, FAILED }
+    public enum State { NULL, ONGOING, COMPLETE, FAILED, ENEMY_DEAD, TASK_CHANGING }
     protected State _taskState;
 
     protected Enemy _myEnemy;
 
+    public abstract bool Reset(Enemy enemy);
     public abstract State DoTask();
 
 }
 
+// Task change event stuff
+public delegate void TaskStateChangeEventHandler(object sender, TaskStateChangedEventArgs e);
+public class TaskStateChangedEventArgs : EventArgs
+{
+    public EnemyTask.State NewState { get; set; }
+    public EnemyTask Task { get; set; }
+}
 
 
+public interface IEnemyTaskGiver
+{
+    TaskStateChangeEventHandler EventHandler { get; }
+}
+
+
+
+
+public class ETDoNothing : EnemyTask
+{
+    public override bool Reset(Enemy enemy) { _myEnemy = enemy; return true; }
+    public override State DoTask()
+    {
+        _myEnemy.DoNothing();
+        return State.COMPLETE; 
+    }
+}
 
 
 
@@ -33,20 +59,26 @@ public class ETWalkTo : EnemyTask
     Vector2 _nodeEnd;
     float _moveDir; //!< 1 for up / right and -1 for down / left
     float _platDelay = 0; //!< Delay to stop chaining platforms too fast
-    
 
 
-
-    public ETWalkTo(Enemy enemy, EnemyPath path, Vector2 target)
+    public ETWalkTo(Vector2 target)
     {
-        _myEnemy = enemy;
-        _path = path;
         _target = target;
-        _curNode = 0;
+    }
+
+    public override bool Reset(Enemy enemy)
+    {
+        if (enemy == null) return false;
+        _myEnemy = enemy;
+
+        _path = EnemyPathfinder.FindPath(_myEnemy, _target);
+        if (_path == null) return false;
 
         //_path.DebugPrint();
+        _curNode = 0;
         _path.NormalizeConnections(new Vector2(1, 1));
         MoveToNode(0);
+        return true;
     }
 
 
@@ -102,6 +134,8 @@ public class ETWalkTo : EnemyTask
             case MoveState.WALKING:
                 if (ReachedNodeEndX())
                 {
+                    if (_curNode == _path.Size - 1) return State.COMPLETE;
+
                     // If platform, may need to jump if end point higher or lower than current pos
                     if (curPathNode.connection == LevelNode.Direction.UP || curPathNode.connection == LevelNode.Direction.DOWN)
                     {
@@ -114,8 +148,7 @@ public class ETWalkTo : EnemyTask
                     else
                     {
                         _moveState = MoveState.IDLE;
-                        if (_curNode == _path.Size - 1) return State.COMPLETE;
-                        else MoveToNode(_curNode + 1);
+                        MoveToNode(_curNode + 1);
                     }
                 }
                 else
@@ -209,10 +242,17 @@ public class ETFlyTo : EnemyTask
 {
     Vector2 _target;
 
-    public ETFlyTo(Enemy enemy, Vector2 target)
+    public ETFlyTo(Vector2 target)
     {
-        _myEnemy = enemy;
         _target = target;
+    }
+
+    public override bool Reset(Enemy enemy)
+    {
+        if (enemy == null) return false;
+
+        _myEnemy = enemy;
+        return true;
     }
 
 
@@ -250,12 +290,18 @@ public class ETChargeAtPlayer : EnemyTask
     enum ChargeState { START_CHARGE, CHARGING, OVERSHOT }
     ChargeState _chargeState;
 
-    public ETChargeAtPlayer(Enemy enemy, float overshoot)
+    public ETChargeAtPlayer(float overshoot)
     {
-        _myEnemy = enemy;
         _playerTrans = GameObject.FindGameObjectWithTag("Player").transform;
         _sqrOvershoot = overshoot * overshoot;
+    }
+
+    public override bool Reset(Enemy enemy)
+    {
+        if (enemy == null) return false;
+        _myEnemy = enemy;
         _chargeState = ChargeState.START_CHARGE;
+        return true;
     }
 
 

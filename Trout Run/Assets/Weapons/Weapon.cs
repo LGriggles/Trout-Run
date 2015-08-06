@@ -9,7 +9,8 @@ public abstract class Weapon : MonoBehaviour
 
     }
 
-
+    public enum Type { PROJECTILE, MELEE }
+    public abstract Type WeaponType { get; }
 
 
     WeaponManager _weaponManager;

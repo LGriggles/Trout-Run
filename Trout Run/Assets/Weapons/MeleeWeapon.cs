@@ -5,6 +5,8 @@ using System.Collections;
 // Base class for all blue-haired swordies
 public class MeleeWeapon : Weapon 
 {
+    public override Type WeaponType { get { return Type.MELEE; } }
+
     // TEMP....
     // Stuck this in for now but when this is finished MeleeWeapon should be abstract class and this can be removed
     public override WeaponName GetName() { return WeaponName.NONE;}

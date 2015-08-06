@@ -1,62 +1,64 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyBehaviour : MonoBehaviour 
+public class EnemyBehaviour 
 {
     Enemy _myEnemy;
     EnemyTask _myTask;
 
-    void Awake()
-    {
-        _myEnemy = GetComponent<Enemy>();
+    public bool IsAssigned { get { return _myEnemy != null; } }
 
+    public EnemyBehaviour()
+    {
     }
 
-	// Use this for initialization
-	void Start ()
+    public void Reset(Enemy enemy)
     {
+        _myEnemy = enemy;
+        _myTask.Reset(enemy);
+    }
 
-	}
+    public void SetTasks(EnemyTask tasks) // should be a list of tasks but ho hum
+    {
+        _myTask = tasks;
+    }
+
+
+    
+
+
 	
-	// Update is called once per frame
-	void Update ()
+	// Update is called from enemy once per frame
+    public EnemyTask.State Update()
     {
-        switch (_myEnemy.CurrentState)
-        {
-            case Enemy.EnemyState.OK:
-                if (_myTask == null)
-                {
-                    _myEnemy.DoNothing();
-                }
-                else
-                {
-                    EnemyTask.State taskState = _myTask.DoTask();
-                    if (taskState != EnemyTask.State.ONGOING)
-                    {
-                        _myTask = null;
-                    }
-                }
-                
-                break;
+        if (_myEnemy == null) return EnemyTask.State.ENEMY_DEAD;
 
-            case Enemy.EnemyState.HIT:
-            case Enemy.EnemyState.DEAD:
-                _myTask = null;
-                
-                break;
+        if (_myTask == null)
+        {
+            _myEnemy.DoNothing();
+            return EnemyTask.State.COMPLETE;
         }
 
 
+        switch (_myEnemy.CurrentState)
+        {
+            case Enemy.EnemyState.OK: 
+                return _myTask.DoTask();
 
-        
-        
+            case Enemy.EnemyState.HIT:
+                return EnemyTask.State.FAILED; // this is because may have been knocked off course and need to recalculate paths etc
 
-	
+            case Enemy.EnemyState.DEAD:
+                _myEnemy = null;
+                return EnemyTask.State.ENEMY_DEAD;
+        }
+
+        return EnemyTask.State.ONGOING;
 	}
 
 
 
-
+    /*
     // Call once to set the current task to move to x - returns false if impossible
     public bool MoveToPosition(Vector2 target)
     {
@@ -87,7 +89,7 @@ public class EnemyBehaviour : MonoBehaviour
         _myTask = new ETChargeAtPlayer(_myEnemy, Random.Range(3, 7));
         return true;
     }
-
+    */
 
 
 

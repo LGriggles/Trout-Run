@@ -27,15 +27,15 @@ public class EnemyBullets : MonoBehaviour
 		pSystem.Emit(position, velocity, pSystem.startSize, pSystem.startLifetime, pSystem.startColor);
 	}
 
-	private void Flash()
-	{
-		Color32 colour = material.GetColor("_TintColor");
-		if(colourUp) colour.g += (byte)(flashSpeed * Time.deltaTime);
-		else colour.g -= (byte)(flashSpeed * Time.deltaTime);
-		
-		if(colour.g >= 250) colourUp = false;
-		else if(colour.g <= 50) colourUp = true;
-		
-		material.SetColor("_TintColor", colour);
-	}
+    private void Flash()
+    {
+        Color32 colour = material.GetColor("_TintColor");
+        if (colourUp) colour.g += (byte)(flashSpeed * Time.deltaTime);
+        else colour.g -= (byte)(flashSpeed * Time.deltaTime);
+
+        if (colour.g >= 250) colourUp = false;
+        else if (colour.g <= 50) colourUp = true;
+
+        material.SetColor("_TintColor", colour);
+    }
 }
